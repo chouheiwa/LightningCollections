@@ -1,0 +1,63 @@
+seed: 1777777
+cuda: True
+benchmark: False
+deterministic: True
+resize_shape:
+  - 256
+  - 256
+augmentation_p: 0.1
+color_jitter: 0.37
+random_rotation_angle: 15
+normalize_means:
+  - 0.50297405
+  - 0.54711632
+  - 0.71049083
+normalize_stds:
+  - 0.18653496
+  - 0.17118206
+  - 0.17080363
+dataset_name: ISIC-2018
+dataset_path: ./datasets/ISIC-2018
+gt_format: '{}_mask.jpg'
+batch_size: 32
+num_workers: 2
+model_name: PMFSNet
+in_channels: 3
+classes: 2
+index_to_class_dict:
+  0: background
+  1: foreground
+resume: null
+pretrain: null
+
+# Optimizer
+optimizer_name: AdamW
+learning_rate: 0.005
+weight_decay: 0.000001
+momentum: 0.9657205586290213
+
+#
+lr_scheduler_name: CosineAnnealingWarmRestarts
+gamma: 0.9582311026945434
+step_size: 20
+milestones:
+  - 1
+  - 3
+  - 5
+  - 7
+  - 8
+  - 9
+T_max: 100
+T_0: 5
+T_mult: 5
+mode: max
+patience: 20
+factor: 0.3
+loss_function_name: DiceLoss
+sigmoid_normalization: false
+
+run_dir: ./runs
+end_epoch: 250
+
+use_image_transform: False
+result_path: ./results

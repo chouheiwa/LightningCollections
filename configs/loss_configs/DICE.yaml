@@ -1,0 +1,4 @@
+class_weight:
+  - 0.029
+  - 0.971
+dice_loss_mode: extension
