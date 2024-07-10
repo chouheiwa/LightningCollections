@@ -4,14 +4,15 @@ from typing import Union, Sequence, Any
 import lightning as L
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torchvision
 from lightning import Callback
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import CSVLogger
+from lightning.pytorch.utilities.model_helpers import is_overridden
 
 from lib.metrics import get_binary_metrics
-from lib import best_model_name
+from lib import best_model_name, lr_scheduler
+from lib.optimizer import get_optimizer
 
 
 class SimpleImageSegmentationModel(L.LightningModule):
@@ -25,6 +26,7 @@ class SimpleImageSegmentationModel(L.LightningModule):
         self.train_metrics = metrics.clone(prefix='train/')
         self.valid_metrics = metrics.clone(prefix='val/')
         self.test_metrics = metrics.clone(prefix='test/')
+        self.valid_losses = []
 
     def forward(self, x):
         return self.net(x)
@@ -39,31 +41,51 @@ class SimpleImageSegmentationModel(L.LightningModule):
         return loss
 
     def training_step(self, batch, batch_idx):
+        has_step = is_overridden("training_step", self.net)
+
+        if has_step:
+            return self.net.training_step(batch, batch_idx, train_metrics=self.train_metrics,
+                                          normalization=self.normalization)
+
         return self._on_step(batch, batch_idx, self.train_metrics)
 
-    def on_train_epoch_end(self) -> None:
+    def on_train_epoch_end(self):
         dic = self.train_metrics.compute()
         self.log_dict(dic)
         self.log('train_IOU', dic['train/BinaryJaccardIndex'], prog_bar=True)
         self.train_metrics.reset()
 
     def validation_step(self, batch, batch_idx):
-        return self._on_step(batch, batch_idx, self.valid_metrics)
+        has_step = is_overridden("validation_step", self.net)
+
+        if has_step:
+            loss = self.net.validation_step(batch, batch_idx, valid_metrics=self.valid_metrics,
+                                            normalization=self.normalization)
+        else:
+            loss = self._on_step(batch, batch_idx, self.valid_metrics)
+        self.valid_losses.append(loss.item())
+        return loss
 
     def on_validation_epoch_end(self):
         dic = self.valid_metrics.compute()
         self.log_dict(dictionary=dic)
         self.log('val_IOU', dic['val/BinaryJaccardIndex'], prog_bar=True)
+        self.log('val_loss', torch.tensor(self.valid_losses).mean(), prog_bar=False)
         self.valid_metrics.reset()
 
     def test_step(self, batch, batch_idx):
+        has_step = is_overridden("test_step", self.net)
         input_tensor, target, image_names = batch
-        output = self(input_tensor)
-        predict = self.normalization(output)
+        if has_step:
+            output = self.net.test_step(batch, batch_idx)
+            predict_latest = self.normalization(output)
+        else:
+            output = self(input_tensor)
+            predict = self.normalization(output)
+            predict_latest = torch.argmax(predict, dim=1)
         # 将预测图像进行分割
-        predict_latest = torch.argmax(predict, dim=1)
-        self.test_metrics.update(predict_latest.float(), target.int())
 
+        self.test_metrics.update(predict_latest.float(), target.int())
         for i in range(predict_latest.size(0)):
             # predict[predict == 1] =
             base_path = self.opt.result_dir
@@ -85,49 +107,30 @@ class SimpleImageSegmentationModel(L.LightningModule):
         self.test_metrics.reset()
 
     def configure_optimizers(self):
-        if self.opt["optimizer_name"] == "SGD":
-            optimizer = optim.SGD(self.net.parameters(), lr=self.opt["learning_rate"], momentum=self.opt["momentum"],
-                                  weight_decay=self.opt["weight_decay"])
+        optimizer = get_optimizer(self.opt, self.net)
+        lr_schedulers = lr_scheduler.get_lr_scheduler(optimizer, self.opt)
+        lr_scheduler_lightning_config = self.opt.lr_scheduler_config.lightning_config
+        lr_scheduler_lightning_config = lr_scheduler_lightning_config.get_dict() if lr_scheduler_lightning_config is not None else {}
 
-        elif self.opt["optimizer_name"] == 'Adagrad':
-            optimizer = optim.Adagrad(self.net.parameters(), lr=self.opt["learning_rate"],
-                                      weight_decay=self.opt["weight_decay"])
-
-        elif self.opt["optimizer_name"] == "RMSprop":
-            optimizer = optim.RMSprop(self.net.parameters(), lr=self.opt["learning_rate"],
-                                      weight_decay=self.opt["weight_decay"],
-                                      momentum=self.opt["momentum"])
-
-        elif self.opt["optimizer_name"] == "Adam":
-            optimizer = optim.Adam(self.net.parameters(), lr=self.opt["learning_rate"],
-                                   weight_decay=self.opt["weight_decay"])
-
-        elif self.opt["optimizer_name"] == "AdamW":
-            optimizer = optim.AdamW(self.net.parameters(), lr=self.opt["learning_rate"],
-                                    weight_decay=self.opt["weight_decay"])
-
-        elif self.opt["optimizer_name"] == "Adamax":
-            optimizer = optim.Adamax(self.net.parameters(), lr=self.opt["learning_rate"],
-                                     weight_decay=self.opt["weight_decay"])
-
-        elif self.opt["optimizer_name"] == "Adadelta":
-            optimizer = optim.Adadelta(self.net.parameters(), lr=self.opt["learning_rate"],
-                                       weight_decay=self.opt["weight_decay"])
-
-        else:
-            raise RuntimeError(f"No {self.opt['optimizer_name']} optimizer available")
         return {
             "optimizer": optimizer,
+            "lr_scheduler": {
+                "scheduler": lr_schedulers,
+                **lr_scheduler_lightning_config,
+            }
         }
 
     def configure_callbacks(self) -> Union[Sequence[Callback], Callback]:
-        early_stop = EarlyStopping(monitor="val/BinaryJaccardIndex", mode="max", patience=20)
-        best_check_point = ModelCheckpoint(
-            filename=best_model_name,
-            monitor='val/BinaryJaccardIndex',
-            mode='max',
-            save_top_k=1,
-            save_on_train_epoch_end=False,
-            enable_version_counter=False,
-        )
-        return [best_check_point, early_stop]
+        callbacks = [
+            ModelCheckpoint(
+                filename=best_model_name,
+                monitor='val/BinaryJaccardIndex',
+                mode='max',
+                save_top_k=1,
+                save_on_train_epoch_end=False,
+                enable_version_counter=False,
+            )
+        ]
+        if self.opt.need_early_stop:
+            callbacks.append(EarlyStopping(monitor="val/BinaryJaccardIndex", mode="max", patience=20))
+        return callbacks

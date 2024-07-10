@@ -2,34 +2,28 @@ from torch import optim
 
 
 def get_optimizer(opt, net):
-    if opt["optimizer_name"] == "SGD":
-        optimizer = optim.SGD(net.parameters(), lr=opt["learning_rate"], momentum=opt["momentum"],
-                              weight_decay=opt["weight_decay"])
+    name = opt.optimizer_config.name
+    optimizer_config = opt.optimizer_config.optimizer.get_dict()
+    if name == "SGD":
+        optimizer = optim.SGD(net.parameters(), **optimizer_config)
 
-    elif opt["optimizer_name"] == 'Adagrad':
-        optimizer = optim.Adagrad(net.parameters(), lr=opt["learning_rate"],
-                                  weight_decay=opt["weight_decay"])
+    elif name == 'Adagrad':
+        optimizer = optim.Adagrad(net.parameters(), **optimizer_config)
 
-    elif opt["optimizer_name"] == "RMSprop":
-        optimizer = optim.RMSprop(net.parameters(), lr=opt["learning_rate"],
-                                  weight_decay=opt["weight_decay"],
-                                  momentum=opt["momentum"])
+    elif name == "RMSprop":
+        optimizer = optim.RMSprop(net.parameters(), **optimizer_config)
 
-    elif opt["optimizer_name"] == "Adam":
-        optimizer = optim.Adam(net.parameters(), lr=opt["learning_rate"],
-                               weight_decay=opt["weight_decay"])
+    elif name == "Adam":
+        optimizer = optim.Adam(net.parameters(), **optimizer_config)
 
-    elif opt["optimizer_name"] == "AdamW":
-        optimizer = optim.AdamW(net.parameters(), lr=opt["learning_rate"],
-                                weight_decay=opt["weight_decay"])
+    elif name == "AdamW":
+        optimizer = optim.AdamW(net.parameters(), **optimizer_config)
 
-    elif opt["optimizer_name"] == "Adamax":
-        optimizer = optim.Adamax(net.parameters(), lr=opt["learning_rate"],
-                                 weight_decay=opt["weight_decay"])
+    elif name == "Adamax":
+        optimizer = optim.Adamax(net.parameters(), **optimizer_config)
 
-    elif opt["optimizer_name"] == "Adadelta":
-        optimizer = optim.Adadelta(net.parameters(), lr=opt["learning_rate"],
-                                   weight_decay=opt["weight_decay"])
+    elif name == "Adadelta":
+        optimizer = optim.Adadelta(net.parameters(), **optimizer_config)
     else:
         raise RuntimeError(f"No {opt['optimizer_name']} optimizer available")
 

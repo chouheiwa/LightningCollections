@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 
 import yaml
 
@@ -11,6 +12,13 @@ class CommandParams:
         for k, v in dic.items():
             if isinstance(v, dict):
                 self._dic[k] = CommandParams(v)
+            elif isinstance(v, str):
+                # str like '1e-4' is float
+                # use regex to match float
+                # '1e-4'
+                reg = r'^[-+]?\d+[eE][-+]\d+$'
+                if re.match(reg, v):
+                    self._dic[k] = float(v)
 
     def __getattr__(self, item):
         try:
@@ -35,6 +43,18 @@ class CommandParams:
 
     def __delitem__(self, key):
         del self._dic[key]
+
+    def items(self):
+        return self._dic.items()
+
+    def get_dict(self):
+        new_dic = {}
+        for k, v in self._dic.items():
+            if isinstance(v, CommandParams):
+                new_dic[k] = v.get_dict()
+            else:
+                new_dic[k] = v
+        return new_dic
 
 
 def read_yaml(file_path):
@@ -62,6 +82,7 @@ class Command:
         parser.add_argument("--dataset_path", type=str, default=None, help="dataset path")
 
         parser.add_argument("--model_name", type=str, default=None, help="model name")
+        parser.add_argument("--classes", type=int, default=None, help="number of classes")
         parser.add_argument("--model_config_path", type=str, default=None,
                             help="model config file path")
         parser.add_argument("--pretrain_weight_path", type=str, default=None, help="pre-trained weight file path")
@@ -69,7 +90,12 @@ class Command:
         parser.add_argument("--loss_function", type=str, default=None, help="loss function name")
         parser.add_argument("--loss_function_config_path", type=str, default=None, help="loss function name")
 
+        parser.add_argument("--optimizer_config_path", type=str, default=None, help="optimizer config file path")
+
+        parser.add_argument("--lr_scheduler_config_path", type=str, default=None, help="lr scheduler config file path")
+
         parser.add_argument("--run_dir", type=str, default=None, help="run progress based directory")
+        parser.add_argument("--need_early_stop", type=bool, default=False, help="need early stop")
 
         parser.add_argument("--image_size", type=int, default=None, help="Image size")
 

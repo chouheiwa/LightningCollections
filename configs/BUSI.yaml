@@ -1,7 +1,4 @@
 seed: 1777777
-cuda: True
-benchmark: False
-deterministic: True
 resize_shape:
   - 256
   - 256
@@ -23,7 +20,7 @@ batch_size: 32
 num_workers: 2
 model_name: PMFSNet
 in_channels: 3
-classes: 2
+classes: 1
 index_to_class_dict:
   0: background
   1: foreground
@@ -31,30 +28,26 @@ resume: null
 pretrain: null
 
 # Optimizer
-optimizer_name: AdamW
-learning_rate: 0.005
-weight_decay: 0.000001
-momentum: 0.9657205586290213
+optimizer_config:
+  name: AdamW
+  optimizer:
+    learning_rate: 1e-4
+    weight_decay: 0.000001
+    momentum: 0.9657205586290213
 
-#
-lr_scheduler_name: CosineAnnealingWarmRestarts
+# lr_scheduler
+lr_scheduler_config:
+  name: CosineAnnealingWarmRestarts
+  scheduler: # For scheduler params you can find it at torch.optim.lr_scheduler.*
+    T_0: 5
+    T_mult: 5
+    eta_min: 0
+    last_epoch: -1
+    verbose: "deprecated"
+  lightning_config: Null # For lightning config you can find it at https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.core.LightningModule.html#lightning.pytorch.core.LightningModule.configure_optimizers
 gamma: 0.9582311026945434
-step_size: 20
-milestones:
-  - 1
-  - 3
-  - 5
-  - 7
-  - 8
-  - 9
-T_max: 100
-T_0: 5
-T_mult: 5
-mode: max
-patience: 20
-factor: 0.3
+
 loss_function_name: DiceLoss
-sigmoid_normalization: false
 
 run_dir: ./runs
 end_epoch: 250

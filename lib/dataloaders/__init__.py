@@ -35,7 +35,7 @@ def get_test_data_loader(opt):
     """
     if "ISIC" in opt["dataset_name"] or "BUSI" in opt["dataset_name"]:
         valid_set = SimpleDataset(opt, mode="valid")
-        valid_loader = DataLoader(valid_set, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
+        valid_loader = DataLoader(valid_set, batch_size=1, shuffle=False, num_workers=opt["num_workers"], pin_memory=True)
 
     else:
         raise RuntimeError(f"No {opt['dataset_name']} dataloader available")

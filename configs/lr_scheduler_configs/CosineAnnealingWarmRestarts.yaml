@@ -1,0 +1,7 @@
+name: CosineAnnealingWarmRestarts
+scheduler:
+  T_0: 5
+  T_mult: 5
+  eta_min: 0
+  last_epoch: -1
+  verbose: "deprecated"

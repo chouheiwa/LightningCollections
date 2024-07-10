@@ -4,7 +4,6 @@ import re
 from lightning import Trainer
 
 from lib import command_helper, dataloaders, models, losses
-from lib.progess_bar import MyProgressBar
 from lib import best_model_name
 
 def get_best_model_checkpoint(opt):
@@ -31,7 +30,17 @@ if __name__ == '__main__':
 
     network = models.get_network_model(command.params, isTrain=False)
 
-    loss_func = losses.get_loss_function(command.params)
+    use_custom_loss_function = False
+
+    try:
+        use_custom_loss_function = network.use_custom_loss_function
+    except:
+        pass
+
+    if not use_custom_loss_function:
+        loss_func = losses.get_loss_function(command.params)
+    else:
+        loss_func = None
 
     model = models.SimpleImageSegmentationModel(net=network, loss_func=loss_func, opt=command.params)
 

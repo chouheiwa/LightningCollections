@@ -8,4 +8,6 @@ matplotlib \
 SimpleITK \
 git+https://gitee.com/wd_kind/torch-toolbox.git \
 rich \
-thop
+thop \
+einops \
+nibabel
