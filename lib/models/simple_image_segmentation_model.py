@@ -10,7 +10,7 @@ from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import CSVLogger
 from lightning.pytorch.utilities.model_helpers import is_overridden
 
-from lib.metrics import get_binary_metrics
+from lib.metrics import get_binary_metrics, cal_params_flops
 from lib import best_model_name, lr_scheduler
 from lib.optimizer import get_optimizer
 
@@ -100,8 +100,11 @@ class SimpleImageSegmentationModel(L.LightningModule):
             )
 
     def on_test_epoch_end(self):
+        params, flops = cal_params_flops(self.net, self.device, self.opt.resize_shape)
         logger = CSVLogger(self.opt.result_dir, name='result', version="")
         dic = self.test_metrics.compute()
+        dic['Parameters'] = params
+        dic['FLOPs'] = flops
         logger.log_metrics(dic)
         logger.save()
         self.test_metrics.reset()

@@ -5,6 +5,7 @@ import torch
 from torchmetrics import *
 from thop import profile
 
+
 class MetricsResult:
     def __init__(self, result, prefix, mission="Binary"):
         self.F1 = result[f"{prefix}/{mission}F1Score"].item()
@@ -57,6 +58,7 @@ class MetricsResult:
         flops, params = profile(model, inputs=(input,))
         return params, flops
 
+
 def get_binary_metrics():
     return MetricCollection(
         [
@@ -69,6 +71,12 @@ def get_binary_metrics():
             AUROC(task="binary"),
             AveragePrecision(task="binary"),
             # IoU
-            JaccardIndex(task="binary", num_labels=2, num_classes=2),
+            JaccardIndex(task="binary"),
         ]
     )
+
+
+def cal_params_flops(model, device, size):
+    input = torch.randn(1, 3, size[0], size[1]).to(device)
+    flops, params = profile(model, inputs=(input,))
+    return params, flops
