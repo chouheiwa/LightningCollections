@@ -1,6 +1,7 @@
 import torch
 from torchvision import models as resnet_model
 from torch import nn
+import lightning as L
 
 
 class FAMBlock(nn.Module):
@@ -79,7 +80,7 @@ class SEBlock(nn.Module):
         return y
 
 
-class FATNet(nn.Module):
+class FATNet(L.LightningModule):
     def __init__(self, n_channels=3, n_classes=1):
         super(FATNet, self).__init__()
 

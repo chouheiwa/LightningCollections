@@ -122,6 +122,9 @@ class Command:
     def merge_args_to_params(self):
         del self.args.config
 
+        if self.args.image_size is not None:
+            self.params.resize_shape = (self.args.image_size, self.args.image_size)
+
         for key, value in vars(self.args).items():
             if value is not None:
                 self.params[key] = value

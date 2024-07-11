@@ -20,7 +20,7 @@ batch_size: 32
 num_workers: 2
 model_name: PMFSNet
 in_channels: 3
-classes: 1
+classes: 2
 index_to_class_dict:
   0: background
   1: foreground
@@ -31,9 +31,8 @@ pretrain: null
 optimizer_config:
   name: AdamW
   optimizer:
-    learning_rate: 1e-4
+    lr: 1e-4
     weight_decay: 0.000001
-    momentum: 0.9657205586290213
 
 # lr_scheduler
 lr_scheduler_config:

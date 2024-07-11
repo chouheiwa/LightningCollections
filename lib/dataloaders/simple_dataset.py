@@ -34,8 +34,8 @@ class SimpleDataset(ImageLoader):
                 array.append(RandomVerticalFlip(p=opt["augmentation_p"]))
                 array.append(RandomRotation(opt["random_rotation_angle"]))
                 array.append(Cutout(p=opt["augmentation_p"], value=(0, 0)))
-            else:
-                array.append(Resize(opt["resize_shape"]))
+
+            array.append(Resize(opt["resize_shape"]))
 
             array.append(ToTensor())
             array.append(Normalize(mean=opt["normalize_means"], std=opt["normalize_stds"]))

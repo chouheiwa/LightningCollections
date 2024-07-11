@@ -34,7 +34,7 @@ the **cmd** to install the python requirements.
 
 ### Training
 
-#### PMFSNet
+#### [PMFSNet](https://github.com/yykzjh/PMFSNet)
 
 Training on BUSI dataset with PMFSNet model and DiceLoss loss function, you can run the following command:
 
