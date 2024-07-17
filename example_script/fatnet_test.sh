@@ -5,7 +5,7 @@ python test.py \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/"${dataset_name}" \
 --model_name FATNet \
 --classes 2 \
---loss_function DiceLoss \
+--loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
 --image_size 224 \
 --run_dir /home/chouheiwa/machine_learning/models/runs \

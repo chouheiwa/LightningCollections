@@ -26,6 +26,7 @@ class SimpleImageSegmentationModel(L.LightningModule):
         self.train_metrics = metrics.clone(prefix='train/')
         self.valid_metrics = metrics.clone(prefix='val/')
         self.test_metrics = metrics.clone(prefix='test/')
+        self.train_losses = []
         self.valid_losses = []
 
     def forward(self, x):
@@ -44,14 +45,17 @@ class SimpleImageSegmentationModel(L.LightningModule):
         has_step = is_overridden("training_step", self.net)
 
         if has_step:
-            return self.net.training_step(batch, batch_idx, train_metrics=self.train_metrics,
+            loss = self.net.training_step(batch, batch_idx, train_metrics=self.train_metrics,
                                           normalization=self.normalization)
-
-        return self._on_step(batch, batch_idx, self.train_metrics)
+        else:
+            loss = self._on_step(batch, batch_idx, self.train_metrics)
+        self.train_losses.append(loss.item())
+        return loss
 
     def on_train_epoch_end(self):
         dic = self.train_metrics.compute()
         self.log_dict(dic)
+        self.log('train_loss', torch.tensor(self.valid_losses).mean(), prog_bar=True)
         self.log('train_IOU', dic['train/BinaryJaccardIndex'], prog_bar=True)
         self.train_metrics.reset()
 
@@ -69,8 +73,8 @@ class SimpleImageSegmentationModel(L.LightningModule):
     def on_validation_epoch_end(self):
         dic = self.valid_metrics.compute()
         self.log_dict(dictionary=dic)
+        self.log('val_loss', torch.tensor(self.valid_losses).mean(), prog_bar=True)
         self.log('val_IOU', dic['val/BinaryJaccardIndex'], prog_bar=True)
-        self.log('val_loss', torch.tensor(self.valid_losses).mean(), prog_bar=False)
         self.valid_metrics.reset()
 
     def test_step(self, batch, batch_idx):

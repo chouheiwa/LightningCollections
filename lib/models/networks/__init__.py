@@ -12,6 +12,9 @@ def get_network_model(opt, isTrain=True):
             if opt.model_name == "FATNet":
                 from .FATNet import FATNet
                 return FATNet(n_classes=opt.classes)
+            if opt.model_name == "FITNet":
+                from .FITNet import FITNet
+                return FITNet(n_classes=opt.classes)
             if opt.model_name == "SwinUnet":
                 from .SwinUnet import SwinUnet
                 return SwinUnet(

@@ -100,7 +100,7 @@ python train.py \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/BUSI_all \
 --model_name PMFSNet \
 --model_config_path ./configs/model_configs/PMFSNet.yaml \
---loss_function DiceLoss \
+--loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
 --run_dir ./runs
 ```
@@ -144,7 +144,7 @@ python train.py \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/"${dataset_name}" \
 --model_name SwinUnet \
 --model_config_path configs/model_configs/swin_tiny_patch4_window7_224_lite.yaml \
---loss_function DiceLoss \
+--loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
 --pretrain_weight_path /home/chouheiwa/machine_learning/pretrained_models/swin_tiny_patch4_window7_224.pth \
 --optimizer_config_path configs/optimizer_configs/adam.yaml \
@@ -171,7 +171,7 @@ python test.py \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/BUSI_all \
 --model_name PMFSNet \
 --model_config_path ./configs/model_configs/PMFSNet.yaml \
---loss_function DiceLoss \
+--loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
 --run_dir ./runs \
 --result_dir ./results

@@ -87,7 +87,7 @@ class Command:
                             help="model config file path")
         parser.add_argument("--pretrain_weight_path", type=str, default=None, help="pre-trained weight file path")
 
-        parser.add_argument("--loss_function", type=str, default=None, help="loss function name")
+        parser.add_argument("--loss_function_name", type=str, default=None, help="loss function name")
         parser.add_argument("--loss_function_config_path", type=str, default=None, help="loss function name")
 
         parser.add_argument("--optimizer_config_path", type=str, default=None, help="optimizer config file path")
