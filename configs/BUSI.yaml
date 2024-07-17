@@ -1,7 +1,7 @@
 seed: 1777777
 resize_shape:
-  - 256
-  - 256
+  - 224
+  - 224
 augmentation_p: 0.1
 color_jitter: 0.37
 random_rotation_angle: 15
@@ -13,9 +13,7 @@ normalize_stds:
   - 0.18653496
   - 0.17118206
   - 0.17080363
-dataset_name: ISIC-2018
-dataset_path: ./datasets/ISIC-2018
-gt_format: '{}_mask.jpg'
+gt_format: '{}.png'
 batch_size: 32
 num_workers: 2
 model_name: PMFSNet

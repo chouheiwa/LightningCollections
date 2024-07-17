@@ -38,7 +38,7 @@ class SimpleDataset(ImageLoader):
             array.append(Resize(opt["resize_shape"]))
 
             array.append(ToTensor())
-            array.append(Normalize(mean=opt["normalize_means"], std=opt["normalize_stds"]))
+            # array.append(Normalize(mean=opt["normalize_means"], std=opt["normalize_stds"]))
 
             trans = Compose(array)
         else:

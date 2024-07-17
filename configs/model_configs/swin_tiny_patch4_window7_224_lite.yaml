@@ -1,0 +1,18 @@
+TYPE: swin
+NAME: swin_tiny_patch4_window7_224
+DROP_PATH_RATE: 0.2
+# Dropout rate
+DROP_RATE: 0.0
+SWIN:
+  FINAL_UPSAMPLE: "expand_first"
+  EMBED_DIM: 96
+  DEPTHS: [ 2, 2, 2, 2 ]
+  DECODER_DEPTHS: [ 2, 2, 2, 1 ]
+  NUM_HEADS: [ 3, 6, 12, 24 ]
+  WINDOW_SIZE: 7
+  PATCH_SIZE: 4
+
+  MLP_RATIO: 4.
+  QKV_BIAS: True
+  APE: False
+  PATCH_NORM: True

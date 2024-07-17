@@ -14,22 +14,10 @@ import torch.nn.functional as F
 import numpy as np
 import math
 from einops import rearrange
-from lightning.pytorch.utilities.types import STEP_OUTPUT
 
+from lib.losses.LGANetStructureLoss import LGANetStructureLoss
 from .pvtv2 import pvt_v2_b2
 import lightning as L
-
-
-def structure_loss(pred, mask):
-    weit = 1 + 5 * torch.abs(F.avg_pool2d(mask, kernel_size=31, stride=1, padding=15) - mask)
-    wbce = F.binary_cross_entropy_with_logits(pred, mask, reduce=None)
-    wbce = (weit * wbce).sum(dim=(2, 3)) / weit.sum(dim=(2, 3))
-
-    pred = torch.sigmoid(pred)
-    inter = ((pred * mask) * weit).sum(dim=(2, 3))
-    union = ((pred + mask) * weit).sum(dim=(2, 3))
-    wiou = 1 - (inter + 1) / (union - inter + 1)
-    return (wbce + wiou).mean()
 
 
 class LGANet(L.LightningModule):
@@ -37,6 +25,7 @@ class LGANet(L.LightningModule):
         super(LGANet, self).__init__()
         self.use_custom_loss_function = True
         self.criteria = nn.BCELoss()
+        self.loss_func = LGANetStructureLoss()
         self.backbone = pvt_v2_b2()  # [64, 128, 320, 512]
         if pretrain_model_path is not None:
             # 打印path所指代的绝对路径
@@ -121,7 +110,7 @@ class LGANet(L.LightningModule):
         # predict = torch.argmax(predict, dim=1, keepdim=True).float()
         train_metrics.update(msk_pred, msk.int())
         # msk_pred = torch.sigmoid(msk_pred)
-        loss_seg = structure_loss(msk_pred, msk)
+        loss_seg = self.loss_func(msk_pred, msk)
         loss_score2 = self.criteria(s2, msk_pool2)
         loss_score3 = self.criteria(s3, msk_pool3)
         loss_score4 = self.criteria(s4, msk_pool4)
@@ -133,7 +122,7 @@ class LGANet(L.LightningModule):
         # predict = normalization(msk_pred)
         # predict = torch.argmax(predict, dim=1, keepdim=True).float()
         valid_metrics.update(msk_pred, msk.int())
-        return structure_loss(msk_pred, msk)
+        return self.loss_func(msk_pred, msk)
 
     def test_step(self, batch, batch_idx):
         img, msk, _ = batch

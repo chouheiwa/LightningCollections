@@ -12,6 +12,14 @@ def get_network_model(opt, isTrain=True):
             if opt.model_name == "FATNet":
                 from .FATNet import FATNet
                 return FATNet(n_classes=opt.classes)
+            if opt.model_name == "SwinUnet":
+                from .SwinUnet import SwinUnet
+                return SwinUnet(
+                    config=opt,
+                    img_size=opt.resize_shape[0],
+                    in_channels=opt.in_channels,
+                    num_classes=opt.classes
+                )
             raise RuntimeError(f"No {opt['model_name']} model available when initialize model")
 
     raise RuntimeError(f"No {opt['dataset_name']} dataset available when initialize model")

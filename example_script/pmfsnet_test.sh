@@ -6,5 +6,5 @@ python test.py \
 --model_config_path ./configs/model_configs/PMFSNet.yaml \
 --loss_function DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
---run_dir ./runs \
---result_dir ./results
+--run_dir /home/chouheiwa/machine_learning/models/runs \
+--result_dir /home/chouheiwa/machine_learning/models/results
