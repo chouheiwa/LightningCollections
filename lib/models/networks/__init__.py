@@ -18,7 +18,8 @@ def get_network_model(opt, isTrain=True):
                     config=opt,
                     img_size=opt.resize_shape[0],
                     in_channels=opt.in_channels,
-                    num_classes=opt.classes
+                    num_classes=opt.classes,
+                    pretrained_path=opt.pretrain_weight_path
                 )
             raise RuntimeError(f"No {opt['model_name']} model available when initialize model")
 
