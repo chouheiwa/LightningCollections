@@ -6,7 +6,7 @@ def get_loss_function(opt):
 
     elif opt["loss_function_name"] == "LGANetStructureLoss":
         from .LGANetStructureLoss import LGANetStructureLoss
-        loss_function = LGANetStructureLoss()
+        loss_function = LGANetStructureLoss(opt.classes, need_expand=opt.loss_function_config.need_expand)
 
     else:
         raise RuntimeError(f"No {opt['loss_function_name']} is available")

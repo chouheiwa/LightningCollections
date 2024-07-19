@@ -12,9 +12,6 @@ def get_network_model(opt, isTrain=True):
             if opt.model_name == "FATNet":
                 from .FATNet import FATNet
                 return FATNet(n_classes=opt.classes)
-            if opt.model_name == "FITNet":
-                from .FITNet import FITNet
-                return FITNet(n_classes=opt.classes)
             if opt.model_name == "SwinUnet":
                 from .SwinUnet import SwinUnet
                 return SwinUnet(
@@ -24,6 +21,9 @@ def get_network_model(opt, isTrain=True):
                     num_classes=opt.classes,
                     pretrained_path=opt.pretrain_weight_path
                 )
+            if opt.model_name == "UNet":
+                from .UNet import UNet
+                return UNet(n_channels=3, n_classes=opt.classes)
             raise RuntimeError(f"No {opt['model_name']} model available when initialize model")
 
     raise RuntimeError(f"No {opt['dataset_name']} dataset available when initialize model")
