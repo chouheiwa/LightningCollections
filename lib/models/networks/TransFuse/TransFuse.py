@@ -1,4 +1,5 @@
 import os.path
+from typing import Union, Tuple
 
 import torch
 import torch.nn as nn
@@ -70,7 +71,9 @@ class BiFusion_block(nn.Module):
 
 
 class TransFuse_S(nn.Module):
-    def __init__(self, num_classes=1, drop_rate=0.2, normal_init=True, pretrained_model_path=None):
+    def __init__(self,
+                 num_classes: int = 1000, drop_rate: float = 0.2, normal_init: bool = True,
+                 image_size: Union[int, Tuple[int, int]] = (192, 256), pretrained_model_path: str = None):
         super(TransFuse_S, self).__init__()
 
         self.resnet = resnet34()
@@ -79,7 +82,7 @@ class TransFuse_S(nn.Module):
         self.resnet.fc = nn.Identity()
         self.resnet.layer4 = nn.Identity()
 
-        self.transformer = deit(pretrained_model_path=pretrained_model_path)
+        self.transformer = deit(pretrained_model_path=pretrained_model_path, image_size=image_size)
 
         self.up1 = Up(in_ch1=384, out_ch=128)
         self.up2 = Up(128, 64)
@@ -117,7 +120,7 @@ class TransFuse_S(nn.Module):
         # bottom-up path
         x_b = self.transformer(imgs)
         x_b = torch.transpose(x_b, 1, 2)
-        x_b = x_b.view(x_b.shape[0], -1, 12, 16)
+        x_b = x_b.view(x_b.shape[0], -1, imgs.shape[2] // 16, imgs.shape[3] // 16)
         x_b = self.drop(x_b)
 
         x_b_1 = self.up1(x_b)
@@ -170,7 +173,9 @@ class TransFuse_S(nn.Module):
 
 
 class TransFuse_L(nn.Module):
-    def __init__(self, num_classes=1, drop_rate=0.2, normal_init=True, pretrained_model_path=None):
+    def __init__(self,
+                 num_classes: int = 1000, drop_rate: float = 0.2, normal_init: bool = True,
+                 image_size: Union[int, Tuple[int, int]] = (192, 256), pretrained_model_path: str = None):
         super(TransFuse_L, self).__init__()
 
         self.resnet = resnet50()
@@ -179,7 +184,7 @@ class TransFuse_L(nn.Module):
         self.resnet.fc = nn.Identity()
         self.resnet.layer4 = nn.Identity()
 
-        self.transformer = deit_base(pretrained_model_path=pretrained_model_path)
+        self.transformer = deit_base(pretrained_model_path=pretrained_model_path, image_size=image_size)
 
         self.up1 = Up(in_ch1=768, out_ch=512)
         self.up2 = Up(512, 256)
@@ -271,7 +276,9 @@ class TransFuse_L(nn.Module):
 
 
 class TransFuse_L_384(nn.Module):
-    def __init__(self, num_classes=1, drop_rate=0.2, normal_init=True, pretrained_model_path=None):
+    def __init__(self,
+                 num_classes: int = 1000, drop_rate: float = 0.2, normal_init: bool = True,
+                 image_size: Union[int, Tuple[int, int]] = (192, 256), pretrained_model_path: str = None):
         super(TransFuse_L_384, self).__init__()
 
         self.resnet = resnet50()
@@ -280,7 +287,7 @@ class TransFuse_L_384(nn.Module):
         self.resnet.fc = nn.Identity()
         self.resnet.layer4 = nn.Identity()
 
-        self.transformer = deit_base_384(pretrained_model_path=pretrained_model_path)
+        self.transformer = deit_base_384(pretrained_model_path=pretrained_model_path, image_size=image_size)
 
         self.up1 = Up(in_ch1=768, out_ch=512)
         self.up2 = Up(512, 256)

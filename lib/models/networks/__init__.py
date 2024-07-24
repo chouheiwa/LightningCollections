@@ -9,6 +9,14 @@ def get_network_model(opt, isTrain=True):
             if opt.model_name == "LGANet":
                 from .LGANet import LGANet
                 return LGANet(channel=32, n_classes=opt.classes, pretrain_model_path=opt.pretrain_weight_path)
+            if opt.model_name == "TransFuse":
+                from .TransFuse import TransFuse
+                return TransFuse(
+                    num_classes=opt.classes,
+                    image_size=opt.resize_shape,
+                    pretrained_model_path=opt.pretrain_weight_path,
+                    **opt.model_config.get_dict()
+                )
             if opt.model_name == "FATNet":
                 from .FATNet import FATNet
                 return FATNet(n_classes=opt.classes)

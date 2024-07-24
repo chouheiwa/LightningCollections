@@ -11,7 +11,6 @@ from timm.models.registry import register_model
 import torch.nn.functional as F
 import numpy as np
 
-
 __all__ = [
     'deit_tiny_patch16_224', 'deit_small_patch16_224', 'deit_base_patch16_224',
     'deit_tiny_distilled_patch16_224', 'deit_small_distilled_patch16_224',
@@ -44,7 +43,10 @@ class DeiT(VisionTransformer):
 
 
 @register_model
-def deit_small_patch16_224(pretrained_model_path=None, **kwargs):
+def deit_small_patch16_224(pretrained_model_path=None, image_size=(192, 256), **kwargs):
+    if image_size is int:
+        image_size = (image_size, image_size)
+
     model = DeiT(
         patch_size=16, embed_dim=384, depth=8, num_heads=6, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
@@ -52,11 +54,11 @@ def deit_small_patch16_224(pretrained_model_path=None, **kwargs):
     if pretrained_model_path is not None:
         ckpt = torch.load(os.path.join(pretrained_model_path, 'deit_small_patch16_224-cd65a155.pth'))
         model.load_state_dict(ckpt['model'], strict=False)
-    
+
     pe = model.pos_embed[:, 1:, :].detach()
     pe = pe.transpose(-1, -2)
     pe = pe.view(pe.shape[0], pe.shape[1], int(np.sqrt(pe.shape[2])), int(np.sqrt(pe.shape[2])))
-    pe = F.interpolate(pe, size=(12, 16), mode='bilinear', align_corners=True)
+    pe = F.interpolate(pe, size=(image_size[0] // 16, image_size[1] // 16), mode='bilinear', align_corners=True)
     pe = pe.flatten(2)
     pe = pe.transpose(-1, -2)
     model.pos_embed = nn.Parameter(pe)
@@ -65,7 +67,10 @@ def deit_small_patch16_224(pretrained_model_path=None, **kwargs):
 
 
 @register_model
-def deit_base_patch16_224(pretrained_model_path=None, **kwargs):
+def deit_base_patch16_224(pretrained_model_path=None, image_size=(192, 256), **kwargs):
+    if image_size is int:
+        image_size = (image_size, image_size)
+
     model = DeiT(
         patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
@@ -77,7 +82,7 @@ def deit_base_patch16_224(pretrained_model_path=None, **kwargs):
     pe = model.pos_embed[:, 1:, :].detach()
     pe = pe.transpose(-1, -2)
     pe = pe.view(pe.shape[0], pe.shape[1], int(np.sqrt(pe.shape[2])), int(np.sqrt(pe.shape[2])))
-    pe = F.interpolate(pe, size=(12, 16), mode='bilinear', align_corners=True)
+    pe = F.interpolate(pe, size=(image_size[0] // 16, image_size[1] // 16), mode='bilinear', align_corners=True)
     pe = pe.flatten(2)
     pe = pe.transpose(-1, -2)
     model.pos_embed = nn.Parameter(pe)
@@ -86,7 +91,9 @@ def deit_base_patch16_224(pretrained_model_path=None, **kwargs):
 
 
 @register_model
-def deit_base_patch16_384(pretrained_model_path=None, **kwargs):
+def deit_base_patch16_384(pretrained_model_path=None, image_size=(192, 256), **kwargs):
+    if image_size is int:
+        image_size = (image_size, image_size)
     model = DeiT(
         img_size=384, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
@@ -98,7 +105,7 @@ def deit_base_patch16_384(pretrained_model_path=None, **kwargs):
     pe = model.pos_embed[:, 1:, :].detach()
     pe = pe.transpose(-1, -2)
     pe = pe.view(pe.shape[0], pe.shape[1], int(np.sqrt(pe.shape[2])), int(np.sqrt(pe.shape[2])))
-    pe = F.interpolate(pe, size=(24, 32), mode='bilinear', align_corners=True)
+    pe = F.interpolate(pe, size=(image_size[0] // 16, image_size[1] // 16), mode='bilinear', align_corners=True)
     pe = pe.flatten(2)
     pe = pe.transpose(-1, -2)
     model.pos_embed = nn.Parameter(pe)

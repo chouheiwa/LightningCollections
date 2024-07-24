@@ -90,6 +90,9 @@ it from the link. After downloading the dataset, you need to unzip the dataset. 
 ### [NUNet](docs/network/nunet.md)
 For NUNet detail information, you can check the [NUNet](docs/network/nunet.md) document.
 
+### [TransFuse](configs/model_configs/TransFuse.yaml)
+For TransFuse detail information, you can check the [TransFuse](configs/model_configs/TransFuse.yaml) document.
+
 ### Training
 
 #### [UNet](https://arxiv.org/abs/1505.04597) (There is no official implementation, so we just give the original paper link)

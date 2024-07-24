@@ -1,11 +1,4 @@
-#!/bin/bash
-
-all_data_array=("all" "bad" "benign" "malignant")
-#all_data_array=("malignant")
-
-
-for data_type in "${all_data_array[@]}"; do
-dataset_name="BUSI_${data_type}"
+dataset_name="BUSI_all"
 python train.py \
 --config configs/BUSI.yaml \
 --dataset_name "${dataset_name}" \
@@ -18,4 +11,3 @@ python train.py \
 --optimizer_config_path configs/optimizer_configs/adam.yaml \
 --lr_scheduler_config_path configs/lr_scheduler_configs/ReduceLROnPlateau.yaml \
 --run_dir /home/chouheiwa/machine_learning/models/runs
-done

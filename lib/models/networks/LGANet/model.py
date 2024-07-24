@@ -1,23 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
-from typing import Any
-
-# @Author   : Guo Qingqing
-# @Date     : 2022/10/7 下午1:25
-# @Software : PyCharm
 
 
+import lightning as L
+import math
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
-import math
 from einops import rearrange
 
 from lib.losses.LGANetStructureLoss import LGANetStructureLoss
 from .pvtv2 import pvt_v2_b2
-import lightning as L
 
 
 class LGANet(L.LightningModule):
@@ -128,6 +122,7 @@ class LGANet(L.LightningModule):
         img, msk, _ = batch
         msk_pred, _, _, _ = self(img)
         return torch.squeeze(msk_pred, dim=1)
+
 
 class LFM_GAM(nn.Module):
     def __init__(self, in_channels, win_size, dim, numbers):

@@ -14,7 +14,7 @@ class LGANetStructureLoss(L.LightningModule):
         self.need_expand = need_expand
 
     def forward(self, pred, mask) -> Any:
-        if self.need_expand or self.classes > 1:
+        if (self.need_expand or self.classes > 1) and mask.dim() == 3:
             mask = expand_as_one_hot(mask.long(), self.classes)
 
         weit = 1 + 5 * torch.abs(F.avg_pool2d(mask, kernel_size=31, stride=1, padding=15) - mask)

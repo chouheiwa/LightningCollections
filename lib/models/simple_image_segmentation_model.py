@@ -73,8 +73,8 @@ class SimpleImageSegmentationModel(L.LightningModule):
     def on_validation_epoch_end(self):
         dic = self.valid_metrics.compute()
         self.log_dict(dictionary=dic)
-        self.log('val_loss', torch.tensor(self.valid_losses).mean(), prog_bar=True)
         self.log('val_IOU', dic['val/BinaryJaccardIndex'], prog_bar=True)
+        self.log('val_loss', torch.tensor(self.valid_losses).mean(), prog_bar=True)
         self.valid_metrics.reset()
 
     def test_step(self, batch, batch_idx):
