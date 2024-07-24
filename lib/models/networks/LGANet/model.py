@@ -11,6 +11,7 @@ import torch.nn.functional as F
 from einops import rearrange
 
 from lib.losses.LGANetStructureLoss import LGANetStructureLoss
+from lib.utils import expand_as_one_hot
 from .pvtv2 import pvt_v2_b2
 
 
@@ -19,7 +20,8 @@ class LGANet(L.LightningModule):
         super(LGANet, self).__init__()
         self.use_custom_loss_function = True
         self.criteria = nn.BCELoss()
-        self.loss_func = LGANetStructureLoss()
+        self.n_classes = n_classes
+        self.loss_func = LGANetStructureLoss(classes=n_classes)
         self.backbone = pvt_v2_b2()  # [64, 128, 320, 512]
         if pretrain_model_path is not None:
             # 打印path所指代的绝对路径
@@ -35,9 +37,9 @@ class LGANet(L.LightningModule):
         self.Translayer3_1 = BasicConv2d(320, channel, 1)
         self.Translayer4_1 = BasicConv2d(512, channel, 1)
 
-        self.atten2 = LFM_GAM(128, 4, 128, 1024)
-        self.atten3 = LFM_GAM(320, 4, 320, 256)
-        self.atten4 = LFM_GAM(512, 4, 512, 64)
+        self.atten2 = LFM_GAM(128, n_classes, 4, 128, 1024)
+        self.atten3 = LFM_GAM(320, n_classes, 4, 320, 256)
+        self.atten4 = LFM_GAM(512, n_classes, 4, 512, 64)
 
         # self.gloabl2 = Attention_Global(128,8)
         # self.gloabl3 = Attention_Global(320,8)
@@ -75,34 +77,35 @@ class LGANet(L.LightningModule):
     def _preload_data(self, batch):
         img, msk, name = batch
         img = img.float()
-        msk = msk.to(torch.float32)
-        msk = msk.unsqueeze(1)
+        # msk = msk.to(torch.float32)
+        # msk = msk.unsqueeze(1)
         return img, msk, name
 
     def training_step(self, batch, batch_idx, train_metrics, normalization):
         img, msk, _ = self._preload_data(batch)
-        msk_pool2 = rearrange(msk, 'b c (h n) (w m) -> b c h w (n m)', h=8, w=8)  # patch_size=4
+        msk_expand = expand_as_one_hot(msk.long(), self.n_classes)
+        msk_pool2 = rearrange(msk_expand, 'b c (h n) (w m) -> b c h w (n m)', h=8, w=8)  # patch_size=4
         msk_pool2 = torch.sum(msk_pool2, dim=-1)
         msk_pool2[msk_pool2 == 0] = 0
         msk_pool2[msk_pool2 == 16] = 0
         msk_pool2[msk_pool2 > 0] = 1
 
-        msk_pool3 = rearrange(msk, 'b c (h n) (w m) -> b c h w (n m)', h=4, w=4)  # patch_size=4
+        msk_pool3 = rearrange(msk_expand, 'b c (h n) (w m) -> b c h w (n m)', h=4, w=4)  # patch_size=4
         msk_pool3 = torch.sum(msk_pool3, dim=-1)
         msk_pool3[msk_pool3 == 0] = 0
         msk_pool3[msk_pool3 == 16] = 0
         msk_pool3[msk_pool3 > 0] = 1
 
-        msk_pool4 = rearrange(msk, 'b c (h n) (w m) -> b c h w (n m)', h=2, w=2)  # patch_size=4
+        msk_pool4 = rearrange(msk_expand, 'b c (h n) (w m) -> b c h w (n m)', h=2, w=2)  # patch_size=4
         msk_pool4 = torch.sum(msk_pool4, dim=-1)
         msk_pool4[msk_pool4 == 0] = 0
         msk_pool4[msk_pool4 == 16] = 0
         msk_pool4[msk_pool4 > 0] = 1
 
         msk_pred, s2, s3, s4 = self(img)
-        # predict = normalization(msk_pred)
-        # predict = torch.argmax(predict, dim=1, keepdim=True).float()
-        train_metrics.update(msk_pred, msk.int())
+        predict = normalization(msk_pred)
+        predict = torch.argmax(predict, dim=1).float()
+        train_metrics.update(predict, msk.int())
         # msk_pred = torch.sigmoid(msk_pred)
         loss_seg = self.loss_func(msk_pred, msk)
         loss_score2 = self.criteria(s2, msk_pool2)
@@ -113,9 +116,9 @@ class LGANet(L.LightningModule):
     def validation_step(self, batch, batch_idx, valid_metrics, normalization):
         img, msk, _ = self._preload_data(batch)
         msk_pred, _, _, _ = self(img)
-        # predict = normalization(msk_pred)
-        # predict = torch.argmax(predict, dim=1, keepdim=True).float()
-        valid_metrics.update(msk_pred, msk.int())
+        predict = normalization(msk_pred)
+        predict = torch.argmax(predict, dim=1).float()
+        valid_metrics.update(predict, msk.int())
         return self.loss_func(msk_pred, msk)
 
     def test_step(self, batch, batch_idx):
@@ -125,10 +128,10 @@ class LGANet(L.LightningModule):
 
 
 class LFM_GAM(nn.Module):
-    def __init__(self, in_channels, win_size, dim, numbers):
+    def __init__(self, in_channels, out_channels, win_size, dim, numbers):
         super(LFM_GAM, self).__init__()
 
-        self.conv = nn.Conv2d(in_channels, 1, kernel_size=1)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
         self.win_size = win_size
         # self.pool = nn.AdaptiveAvgPool2d(patch_num)
         self.sigmoid = nn.Sigmoid()

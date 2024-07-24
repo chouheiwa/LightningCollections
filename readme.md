@@ -31,8 +31,6 @@ You can also open the `setup/setup.sh` or `setup/conda_setup.sh` and `setup/base
 the **cmd** to install the python requirements.
 
 ### Pretrained Models
-#### LGANet
-You can download the pretrained model from [here](https://drive.google.com/drive/folders/1Eu8v9vMRvt-dyCH0XSV2i77lAd62nPXV).
 #### SwinUnet
 You can download the pretrained model from [here](https://drive.google.com/drive/folders/1UC3XOoezeum0uck4KBVGa8osahs6rKUY?usp=sharing).
 
@@ -90,8 +88,11 @@ it from the link. After downloading the dataset, you need to unzip the dataset. 
 ### [NUNet](docs/network/nunet.md)
 For NUNet detail information, you can check the [NUNet](docs/network/nunet.md) document.
 
-### [TransFuse](configs/model_configs/TransFuse.yaml)
-For TransFuse detail information, you can check the [TransFuse](configs/model_configs/TransFuse.yaml) document.
+### [TransFuse](docs/network/TransFuse.md)
+For TransFuse detail information, you can check the [TransFuse](docs/network/TransFuse.md) document.
+
+### [LGANet](docs/network/LGANet.md)
+For TransFuse detail information, you can check the [TransFuse](docs/network/LGANet.mds) document.
 
 ### Training
 
@@ -136,26 +137,6 @@ Note:
 4. The params with the suffix `config_path` will be load with yaml and the params without the suffix add to the param,
    so if you don't want to use the yaml config path, you can just add them in your config file.
 
-#### LGANet
-
-Training on BUSI dataset with LGANet model doesn't need to config the loss function, you can run the following command:
-
-```shell
-python train.py \
---config configs/BUSI.yaml \
---dataset_name BUSI_all \
---dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/BUSI_all \
---model_name LGANet \
---classes 1 \
---image_size 256 \
---pretrain_weight_path /home/chouheiwa/machine_learning/pretrained_models/pvt_v2_b2.pth
-```
-
-Note:
-
-1. The `--classes` for image segmentation need to be 1, due to the train/validation/test compute loss logic.
-2. The `--image_size` is the input image size need to be 256, so you need to resize the image to 256x256, or else you need to change the model structure.
-
 #### [SwinUnet](https://github.com/HuCaoFighting/Swin-Unet)
 Training on BUSI dataset with SwinUnet model, you can run the following command:
 
@@ -195,22 +176,6 @@ python test.py \
 --model_config_path ./configs/model_configs/PMFSNet.yaml \
 --loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
---run_dir ./runs \
---result_dir ./results
-```
-
-#### LGANet
-
-Testing on BUSI dataset with LGANet model doesn't need to config the loss function, you can run the following command:
-
-```shell
-python test.py \
---config configs/BUSI.yaml \
---dataset_name BUSI_all \
---dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/BUSI_all \
---model_name LGANet \
---classes 1 \
---pretrain_weight_path /home/chouheiwa/machine_learning/pretrained_models/pvt_v2_b2.pth \
 --run_dir ./runs \
 --result_dir ./results
 ```
