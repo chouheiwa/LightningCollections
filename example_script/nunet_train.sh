@@ -6,8 +6,9 @@ python train.py \
 --model_name NUNet \
 --classes 2 \
 --image_size 256 \
---optimizer_config_path configs/optimizer_configs/adam.yaml \
---lr_scheduler_config_path configs/lr_scheduler_configs/ReduceLROnPlateau.yaml \
+--batch_size 12 \
+--end_epoch 1000 \
 --loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
+--optimizer_config_path configs/optimizer_configs/NUNet/adam.yaml \
 --run_dir /home/chouheiwa/machine_learning/models/runs

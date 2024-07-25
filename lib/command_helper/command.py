@@ -98,6 +98,8 @@ class Command:
         parser.add_argument("--need_early_stop", type=bool, default=False, help="need early stop")
 
         parser.add_argument("--image_size", type=int, default=None, help="Image size")
+        parser.add_argument("--batch_size", type=int, default=None, help="Batch size")
+        parser.add_argument("--end_epoch", type=int, default=None, help="End epoch")
 
         parser.add_argument("--result_dir", type=str, default=None,
                             help="Result Root Directory (Only Used For Testing)")

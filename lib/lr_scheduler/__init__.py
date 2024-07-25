@@ -1,6 +1,9 @@
 from torch.optim import lr_scheduler
 
 def get_lr_scheduler(optimizer, config):
+    if config.lr_scheduler_config is None:
+        return None
+
     name = config.lr_scheduler_config.name
     scheduler = config.lr_scheduler_config.scheduler
     scheduler = scheduler.get_dict() if scheduler is not None else {}

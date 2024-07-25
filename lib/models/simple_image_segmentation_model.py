@@ -55,7 +55,7 @@ class SimpleImageSegmentationModel(L.LightningModule):
     def on_train_epoch_end(self):
         dic = self.train_metrics.compute()
         self.log_dict(dic)
-        self.log('train_loss', torch.tensor(self.valid_losses).mean(), prog_bar=True)
+        self.log('train_loss', torch.tensor(self.train_losses).mean(), prog_bar=True)
         self.log('train_IOU', dic['train/BinaryJaccardIndex'], prog_bar=True)
         self.train_metrics.reset()
 
@@ -116,6 +116,12 @@ class SimpleImageSegmentationModel(L.LightningModule):
     def configure_optimizers(self):
         optimizer = get_optimizer(self.opt, self.net)
         lr_schedulers = lr_scheduler.get_lr_scheduler(optimizer, self.opt)
+
+        if lr_schedulers is None:
+            return {
+                "optimizer": optimizer,
+            }
+
         lr_scheduler_lightning_config = self.opt.lr_scheduler_config.lightning_config
         lr_scheduler_lightning_config = lr_scheduler_lightning_config.get_dict() if lr_scheduler_lightning_config is not None else {}
 
