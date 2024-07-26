@@ -141,20 +141,3 @@ class SimpleImageSegmentationModel(L.LightningModule):
                 **lr_scheduler_lightning_config,
             }
         }
-
-    def configure_callbacks(self) -> Union[Sequence[Callback], Callback]:
-        callbacks = [
-            ModelCheckpoint(
-                filename=best_model_name,
-                monitor='val/BinaryJaccardIndex',
-                mode='max',
-                save_top_k=1,
-                save_last=True,
-                save_weights_only=True,
-                save_on_train_epoch_end=True,
-                enable_version_counter=False,
-            )
-        ]
-        if self.opt.need_early_stop:
-            callbacks.append(EarlyStopping(monitor="val/BinaryJaccardIndex", mode="max", patience=20))
-        return callbacks

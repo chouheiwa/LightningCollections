@@ -1,6 +1,8 @@
 from lightning import Trainer
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 
-from lib import command_helper, dataloaders, models, losses
+from lib import command_helper, dataloaders, models, losses, best_model_name
+from lib.progress_bar import CustomProgressBar
 
 if __name__ == '__main__':
     command = command_helper.Command()
@@ -22,10 +24,26 @@ if __name__ == '__main__':
         loss_func = None
 
     model = models.SimpleImageSegmentationModel(net=network, loss_func=loss_func, opt=command.params)
+    callbacks = [
+        CustomProgressBar(command.params.dataset_name, command.params.model_name),
+        ModelCheckpoint(
+            filename=best_model_name,
+            monitor='val/BinaryJaccardIndex',
+            mode='max',
+            save_top_k=1,
+            save_last=True,
+            save_weights_only=True,
+            save_on_train_epoch_end=True,
+            enable_version_counter=False,
+        )
+    ]
+    if command.params.need_early_stop:
+        callbacks.append(EarlyStopping(monitor="val/BinaryJaccardIndex", mode="max", patience=20))
 
     trainer = Trainer(
         default_root_dir=command.params.run_dir,
         benchmark=True,
         max_epochs=command.params.end_epoch,
+        callbacks=callbacks
     )
     trainer.fit(model, train_loader, valid_loader)
