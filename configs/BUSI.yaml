@@ -5,14 +5,6 @@ resize_shape:
 augmentation_p: 0.1
 color_jitter: 0.37
 random_rotation_angle: 15
-normalize_means:
-  - 0.50297405
-  - 0.54711632
-  - 0.71049083
-normalize_stds:
-  - 0.18653496
-  - 0.17118206
-  - 0.17080363
 gt_format: '{}.png'
 batch_size: 32
 num_workers: 2

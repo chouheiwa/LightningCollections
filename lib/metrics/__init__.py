@@ -5,7 +5,6 @@ import torch
 from torchmetrics import *
 from thop import profile
 
-
 class MetricsResult:
     def __init__(self, result, prefix, mission="Binary"):
         self.F1 = result[f"{prefix}/{mission}F1Score"].item()

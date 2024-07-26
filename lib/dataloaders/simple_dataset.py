@@ -16,7 +16,7 @@ class SimpleDataset(ImageLoader):
     load ISIC 2018 dataset
     """
 
-    def __init__(self, opt, mode):
+    def __init__(self, opt, mode, auto_append=True, need_metrics=True):
         """
         initialize ISIC 2018 dataset
         :param opt: params dict
@@ -26,9 +26,9 @@ class SimpleDataset(ImageLoader):
             array = []
             if opt.use_image_transform:
                 array.append(RandomResizedCrop(tuple(opt["resize_shape"]), scale=(0.4, 1.0),
-                                                             ratio=(3. / 4., 4. / 3.), interpolation='BILINEAR'))
+                                               ratio=(3. / 4., 4. / 3.), interpolation='BILINEAR'))
                 array.append(ColorJitter(brightness=opt["color_jitter"], contrast=opt["color_jitter"],
-                                                       saturation=opt["color_jitter"], hue=0))
+                                         saturation=opt["color_jitter"], hue=0))
                 array.append(RandomGaussianNoise(p=opt["augmentation_p"]))
                 array.append(RandomHorizontalFlip(p=opt["augmentation_p"]))
                 array.append(RandomVerticalFlip(p=opt["augmentation_p"]))
@@ -38,21 +38,21 @@ class SimpleDataset(ImageLoader):
             array.append(Resize(opt["resize_shape"]))
 
             array.append(ToTensor())
-            # array.append(Normalize(mean=opt["normalize_means"], std=opt["normalize_stds"]))
 
             trans = Compose(array)
         else:
             trans = Compose([
                 Resize(opt["resize_shape"]),
                 ToTensor(),
-                Normalize(mean=opt["normalize_means"], std=opt["normalize_stds"])
             ])
+        base_path = opt["dataset_path"]
 
-        base_path = os.path.join(opt["dataset_path"], "train" if mode == "train" else "val")
+        if auto_append:
+            base_path = os.path.join(opt["dataset_path"], "train" if mode == "train" else "val")
 
         super(SimpleDataset, self).__init__(
             origin_image_path=os.path.join(base_path, "images"),
-            gt_image_path=os.path.join(base_path, "masks"),
+            gt_image_path=os.path.join(base_path, "masks") if need_metrics else None,
             mode=mode,
             transforms=trans,
             support_types=['jpg', 'png', 'jpeg', 'bmp', 'tif', 'tiff', 'JPG', 'PNG', 'JPEG', 'BMP', 'TIF', 'TIFF'],

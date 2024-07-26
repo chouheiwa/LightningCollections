@@ -9,7 +9,7 @@ class CELoss(L.LightningModule):
     def __init__(self, num_classes, class_weight):
         assert (class_weight is not None, "class_weight is required for CELoss")
         super(CELoss, self).__init__()
-        self.register_buffer('class_weight', torch.FloatTensor(class_weight))
+        self.register_buffer('class_weight', torch.FloatTensor(class_weight), persistent=False)
         self.num_classes = num_classes
         self.loss = nn.CrossEntropyLoss(weight=self.class_weight)
 

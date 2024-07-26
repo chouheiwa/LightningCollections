@@ -44,9 +44,13 @@ class ImageLoader(Dataset):
         image_path = self.image_paths[index]
         origin_image_name, extension = splitext(basename(image_path))
         filename = self.get_gt_file_name(origin_image_name, extension)
+        image = cv2.imread(image_path, -1)
+        if self.ground_truth_path is None:
+            return image, None, origin_image_name
+
         GT_path = join(self.ground_truth_path, filename)
 
-        image = cv2.imread(image_path, -1)
+
         label = cv2.imread(GT_path, -1)
 
         try:

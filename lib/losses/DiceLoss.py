@@ -9,12 +9,12 @@ class DiceLoss(L.LightningModule):
     """
 
     def __init__(self, classes=1, weight=None, sigmoid_normalization=False, mode="extension"):
-        assert(weight is not None, "Weight is required for DiceLoss")
+        assert (weight is not None, "Weight is required for DiceLoss")
         super(DiceLoss, self).__init__()
         self.classes = classes
-        self.register_buffer('weight', torch.FloatTensor(weight))
+        self.register_buffer('weight', torch.FloatTensor(weight), persistent=False)
         self.mode = mode
-        
+
         if sigmoid_normalization:
             self.normalization = nn.Sigmoid()
         else:
@@ -28,7 +28,6 @@ class DiceLoss(L.LightningModule):
         input = self.normalization(input)
 
         return compute_per_channel_dice(input, target, epsilon=1e-6, mode=self.mode)
-
 
     def forward(self, input, target):
         per_channel_dice = self.dice(input, target)

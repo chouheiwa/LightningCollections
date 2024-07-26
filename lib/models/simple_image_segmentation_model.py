@@ -16,7 +16,7 @@ from lib.optimizer import get_optimizer
 
 
 class SimpleImageSegmentationModel(L.LightningModule):
-    def __init__(self, net, loss_func, opt):
+    def __init__(self, net, opt, loss_func):
         super().__init__()
         self.net = net
         self.loss_func = loss_func
@@ -38,26 +38,34 @@ class SimpleImageSegmentationModel(L.LightningModule):
         predict = self.normalization(output)
         predict = torch.argmax(predict, dim=1)
         metrics.update(predict.float(), target.int())
+
         loss = self.loss_func(output, target)
         return loss
+
+    def on_train_epoch_start(self):
+        self.train_metrics.reset()
+        self.train_losses.clear()
 
     def training_step(self, batch, batch_idx):
         has_step = is_overridden("training_step", self.net)
 
         if has_step:
-            loss = self.net.training_step(batch, batch_idx, train_metrics=self.train_metrics,
+            loss = self.net.training_step(batch, batch_idx,
+                                          train_metrics=self.train_metrics,
                                           normalization=self.normalization)
         else:
             loss = self._on_step(batch, batch_idx, self.train_metrics)
         self.train_losses.append(loss.item())
         return loss
-
     def on_train_epoch_end(self):
         dic = self.train_metrics.compute()
         self.log_dict(dic)
         self.log('train_loss', torch.tensor(self.train_losses).mean(), prog_bar=True)
         self.log('train_IOU', dic['train/BinaryJaccardIndex'], prog_bar=True)
-        self.train_metrics.reset()
+
+    def on_validation_epoch_start(self):
+        self.valid_metrics.reset()
+        self.valid_losses.clear()
 
     def validation_step(self, batch, batch_idx):
         has_step = is_overridden("validation_step", self.net)
@@ -69,34 +77,32 @@ class SimpleImageSegmentationModel(L.LightningModule):
             loss = self._on_step(batch, batch_idx, self.valid_metrics)
         self.valid_losses.append(loss.item())
         return loss
-
     def on_validation_epoch_end(self):
         dic = self.valid_metrics.compute()
         self.log_dict(dictionary=dic)
         self.log('val_IOU', dic['val/BinaryJaccardIndex'], prog_bar=True)
         self.log('val_loss', torch.tensor(self.valid_losses).mean(), prog_bar=True)
-        self.valid_metrics.reset()
 
     def test_step(self, batch, batch_idx):
         has_step = is_overridden("test_step", self.net)
         input_tensor, target, image_names = batch
         if has_step:
             output = self.net.test_step(batch, batch_idx)
-            predict_latest = self.normalization(output)
         else:
             output = self(input_tensor)
-            predict = self.normalization(output)
-            predict_latest = torch.argmax(predict, dim=1)
+        predict = self.normalization(output)
+        predict = torch.argmax(predict, dim=1)
         # 将预测图像进行分割
+        if not self.opt.forbid_metrics:
+            self.test_metrics.update(predict.float(), target.int())
 
-        self.test_metrics.update(predict_latest.float(), target.int())
-        for i in range(predict_latest.size(0)):
+        for i in range(predict.size(0)):
             # predict[predict == 1] =
             base_path = self.opt.result_dir
             os.makedirs(base_path, exist_ok=True)
 
             torchvision.utils.save_image(
-                predict_latest[i].float(),
+                predict[i].float(),
                 os.path.join(
                     self.opt.result_dir,
                     f'{image_names[i]}.png'
@@ -104,9 +110,12 @@ class SimpleImageSegmentationModel(L.LightningModule):
             )
 
     def on_test_epoch_end(self):
+        if self.opt.forbid_metrics:
+            return
         params, flops = cal_params_flops(self.net, self.device, self.opt.resize_shape)
         logger = CSVLogger(self.opt.result_dir, name='result', version="")
         dic = self.test_metrics.compute()
+        self.log_dict(dic, prog_bar=True)
         dic['Parameters'] = params
         dic['FLOPs'] = flops
         logger.log_metrics(dic)
@@ -140,7 +149,9 @@ class SimpleImageSegmentationModel(L.LightningModule):
                 monitor='val/BinaryJaccardIndex',
                 mode='max',
                 save_top_k=1,
-                save_on_train_epoch_end=False,
+                save_last=True,
+                save_weights_only=True,
+                save_on_train_epoch_end=True,
                 enable_version_counter=False,
             )
         ]

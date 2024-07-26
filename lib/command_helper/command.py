@@ -65,7 +65,7 @@ def read_yaml(file_path):
 
 class Command:
     def __init__(self, isTest=False):
-        self.args = self.parse_args()
+        self.args = self.parse_args(isTest)
         self.parse_args_config()
         try:
             self.params = read_yaml(self.args.config)
@@ -74,7 +74,7 @@ class Command:
             raise
         self.get_root_dir()
 
-    def parse_args(self):
+    def parse_args(self, isTest=False):
         parser = argparse.ArgumentParser()
         parser.add_argument("--config", type=str, default='./configs/BUSI.yaml', help="config file path")
 
@@ -82,27 +82,32 @@ class Command:
         parser.add_argument("--dataset_path", type=str, default=None, help="dataset path")
 
         parser.add_argument("--model_name", type=str, default=None, help="model name")
-        parser.add_argument("--classes", type=int, default=None, help="number of classes")
         parser.add_argument("--model_config_path", type=str, default=None,
                             help="model config file path")
+
+        parser.add_argument("--classes", type=int, default=None, help="number of classes")
+
         parser.add_argument("--pretrain_weight_path", type=str, default=None, help="pre-trained weight file path")
 
-        parser.add_argument("--loss_function_name", type=str, default=None, help="loss function name")
-        parser.add_argument("--loss_function_config_path", type=str, default=None, help="loss function name")
-
-        parser.add_argument("--optimizer_config_path", type=str, default=None, help="optimizer config file path")
-
-        parser.add_argument("--lr_scheduler_config_path", type=str, default=None, help="lr scheduler config file path")
-
         parser.add_argument("--run_dir", type=str, default=None, help="run progress based directory")
-        parser.add_argument("--need_early_stop", type=bool, default=False, help="need early stop")
 
         parser.add_argument("--image_size", type=int, default=None, help="Image size")
-        parser.add_argument("--batch_size", type=int, default=None, help="Batch size")
-        parser.add_argument("--end_epoch", type=int, default=None, help="End epoch")
-
-        parser.add_argument("--result_dir", type=str, default=None,
-                            help="Result Root Directory (Only Used For Testing)")
+        if isTest:
+            parser.add_argument("--result_dir", type=str, default=None,
+                                help="Result Root Directory")
+            parser.add_argument("--forbid_auto_append", type=bool, default=False,
+                                help="Auto append the 'train' or 'val' to the dataset_path")
+            parser.add_argument("--forbid_metrics", type=bool, default=False,
+                                help="need metrics, if need metrics then you must provide the mask image path")
+        else:
+            parser.add_argument("--optimizer_config_path", type=str, default=None, help="optimizer config file path")
+            parser.add_argument("--lr_scheduler_config_path", type=str, default=None,
+                                help="lr scheduler config file path")
+            parser.add_argument("--loss_function_name", type=str, default=None, help="loss function name")
+            parser.add_argument("--loss_function_config_path", type=str, default=None, help="loss function name")
+            parser.add_argument("--batch_size", type=int, default=None, help="Batch size")
+            parser.add_argument("--end_epoch", type=int, default=None, help="End epoch")
+            parser.add_argument("--need_early_stop", type=bool, default=False, help="need early stop")
 
         args = parser.parse_args()
         return args

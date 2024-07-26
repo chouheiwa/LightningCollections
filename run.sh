@@ -1,6 +1,6 @@
 #!/bin/bash
 
-all_data_array=("all" "bad" "benign" "malignant")
+all_data_array=("all")
 #all_data_array=("malignant")
 
 
@@ -10,11 +10,11 @@ python train.py \
 --config configs/BUSI.yaml \
 --dataset_name "${dataset_name}" \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/"${dataset_name}" \
---model_name NUNet \
+--model_name UNet \
 --classes 2 \
---image_size 256 \
+--image_size 224 \
 --batch_size 12 \
---end_epoch 1000 \
+--end_epoch 250 \
 --loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
 --optimizer_config_path configs/optimizer_configs/NUNet/adam.yaml \

@@ -34,7 +34,7 @@ def get_test_data_loader(opt):
     :return:
     """
     if "ISIC" in opt["dataset_name"] or "BUSI" in opt["dataset_name"]:
-        valid_set = SimpleDataset(opt, mode="valid")
+        valid_set = SimpleDataset(opt, mode="valid", auto_append=not opt.forbid_auto_append, need_metrics=not opt.forbid_metrics)
         valid_loader = DataLoader(valid_set, batch_size=1, shuffle=False, num_workers=opt["num_workers"], pin_memory=True)
 
     else:
