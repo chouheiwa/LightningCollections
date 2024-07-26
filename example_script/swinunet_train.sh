@@ -1,4 +1,6 @@
-dataset_name="BUSI_all"
+#!/bin/bash
+dataset_name=${1:-"BUSI_all"}
+
 python train.py \
 --config configs/BUSI.yaml \
 --dataset_name "${dataset_name}" \

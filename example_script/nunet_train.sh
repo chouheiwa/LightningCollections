@@ -1,4 +1,6 @@
-dataset_name="BUSI_all"
+#!/bin/bash
+dataset_name=${1:-"BUSI_all"}
+
 python train.py \
 --config configs/BUSI.yaml \
 --dataset_name "${dataset_name}" \
@@ -7,7 +9,6 @@ python train.py \
 --classes 2 \
 --image_size 256 \
 --batch_size 12 \
---end_epoch 1000 \
 --loss_function_name DiceLoss \
 --loss_function_config_path configs/loss_configs/DICE.yaml \
 --optimizer_config_path configs/optimizer_configs/NUNet/adam.yaml \
