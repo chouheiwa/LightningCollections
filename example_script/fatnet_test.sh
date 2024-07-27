@@ -8,7 +8,5 @@ python test.py \
 --model_name FATNet \
 --classes 2 \
 --image_size 224 \
---loss_function_name DiceLoss \
---loss_function_config_path configs/loss_configs/DICE.yaml \
 --run_dir /home/chouheiwa/machine_learning/models/runs \
 --result_dir /home/chouheiwa/machine_learning/models/results

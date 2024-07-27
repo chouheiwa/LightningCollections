@@ -8,6 +8,5 @@ python test.py \
 --model_name LGANet \
 --classes 2 \
 --image_size 256 \
---pretrain_weight_path /home/chouheiwa/machine_learning/pretrained_models/pvt_v2_b2.pth \
 --run_dir /home/chouheiwa/machine_learning/models/runs \
 --result_dir /home/chouheiwa/machine_learning/models/results

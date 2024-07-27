@@ -1,9 +1,7 @@
 # LGANet
-## Network Description
-The original code repository is [here](https://github.com/AHU-VRV/LGANet).
-
-## Pretrained Models
-You can download the pretrained model from [here](https://drive.google.com/drive/folders/1Eu8v9vMRvt-dyCH0XSV2i77lAd62nPXV).
+|              Code Repository              |                        Paper                         |                                 Pretrained Model                                 |
+|:-----------------------------------------:|:----------------------------------------------------:|:--------------------------------------------------------------------------------:|
+| [Link](https://github.com/AHU-VRV/LGANet) | [Link](https://ieeexplore.ieee.org/document/9527678) | [Link](https://drive.google.com/drive/folders/1Eu8v9vMRvt-dyCH0XSV2i77lAd62nPXV) |
 
 ## Network Usage Description
 

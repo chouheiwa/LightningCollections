@@ -5,6 +5,7 @@ from lightning import Trainer
 
 from lib import command_helper, dataloaders, models
 from lib import best_model_name
+from lib.progress_bar import CustomProgressBar
 
 def get_best_model_checkpoint(opt):
     best_path = None
@@ -35,6 +36,7 @@ if __name__ == '__main__':
     trainer = Trainer(
         default_root_dir=command.params.run_dir,
         benchmark=True,
-        inference_mode=False
+        inference_mode=False,
+        callbacks=[CustomProgressBar(command.params.dataset_name, command.params.model_name)]
     )
     trainer.test(model, test_loader, ckpt_path=best_ckpt_path)

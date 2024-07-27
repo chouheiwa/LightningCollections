@@ -92,6 +92,7 @@ class Command:
         parser.add_argument("--run_dir", type=str, default=None, help="run progress based directory")
 
         parser.add_argument("--image_size", type=int, default=None, help="Image size")
+        parser.add_argument("--gt_format", type=str, default=None, help="Ground truth image file format")
         if isTest:
             parser.add_argument("--result_dir", type=str, default=None,
                                 help="Result Root Directory")
