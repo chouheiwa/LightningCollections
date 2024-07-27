@@ -6,6 +6,7 @@ python test.py \
 --dataset_name "${dataset_name}" \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/"${dataset_name}" \
 --model_name PMFSNet \
+--image_size 224 \
 --model_config_path ./configs/model_configs/PMFSNet.yaml \
 --run_dir /home/chouheiwa/machine_learning/models/runs \
 --result_dir /home/chouheiwa/machine_learning/models/results

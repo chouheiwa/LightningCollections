@@ -3,7 +3,7 @@ def get_network_model(opt, isTrain=True):
     simple_image_segmentation_datasets = ["ISIC", "BUSI"]
     for dataset in simple_image_segmentation_datasets:
         if dataset in opt["dataset_name"]:
-            if opt["model_name"] == "PMFSNet":
+            if opt.model_name == "PMFSNet":
                 from .PMFSNet import PMFSNet
                 return PMFSNet(opt)
             if opt.model_name == "LGANet":

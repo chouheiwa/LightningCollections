@@ -1,6 +1,14 @@
+## Introduction
+
+Our project is a simple image segmentation project that we aim to implement more segmentation network that to help us to
+write out essay easier.
+
+We used pytorch lightning to implement the project and we also provide the pretrained model for the network that we
+implemented.
+
 ## Setup
 
-### Requirements
+### Basic Requirements
 
 - Python 3.10
 - Pytorch >= 2.0
@@ -31,13 +39,22 @@ You can also open the `setup/setup.sh` or `setup/conda_setup.sh` and `setup/base
 the **cmd** to install the python requirements.
 
 ### Pretrained Models
-#### SwinUnet
-You can download the pretrained model from [here](https://drive.google.com/drive/folders/1UC3XOoezeum0uck4KBVGa8osahs6rKUY?usp=sharing).
 
-### Data Preparation
+#### SwinUnet
+
+You can download the pretrained model
+from [here](https://drive.google.com/drive/folders/1UC3XOoezeum0uck4KBVGa8osahs6rKUY?usp=sharing).
+
+### Dataset Preparation
+
+Now we support the following datasets:
+
+- [x] [BUSI](docs/dataset/BUSI.md)
 
 #### Common Simple Image Segmentation Dataset
+
 1. You need to prepare the dataset in the following structure:
+
 ```
 └── train
 │   ├── images
@@ -46,136 +63,30 @@ You can download the pretrained model from [here](https://drive.google.com/drive
     ├── images
     └── masks
 ```
-#### BUSI Dataset
-
-The original dataset is in
-the [BUSI dataset](https://academictorrents.com/details/1f0b5b8b9d3f6f1b3e8f4baf1b7e3f3b6f3b7f1b) and you can download
-it from the link. After downloading the dataset, you need to unzip the dataset. The dataset structure is as follows:
-
-```
-├── BUSI_all
-│   ├── train
-│   │   ├── images
-│   │   └── masks
-│   └── val
-│       ├── images
-│       └── masks
-├── BUSI_bad
-│   ├── train
-│   │   ├── images
-│   │   └── masks
-│   └── val
-│       ├── images
-│       └── masks
-├── BUSI_benign
-│   ├── train
-│   │   ├── images
-│   │   └── masks
-│   └── val
-│       ├── images
-│       └── masks
-└── BUSI_maligant
-    ├── train
-    │   ├── images
-    │   └── masks
-    └── val
-        ├── images
-        └── masks
-```
 
 ## Run
 
-### [NUNet](docs/network/nunet.md)
-For NUNet detail information, you can check the [NUNet](docs/network/nunet.md) document.
+### Network
 
-### [TransFuse](docs/network/TransFuse.md)
-For TransFuse detail information, you can check the [TransFuse](docs/network/TransFuse.md) document.
+Now we implement the following networks(you can click the name to see the detail information):
 
-### [LGANet](docs/network/LGANet.md)
-For TransFuse detail information, you can check the [TransFuse](docs/network/LGANet.mds) document.
+- [x] [UNet](docs/network/UNet.md)
+- [x] [PMFSNet](docs/network/PMFSNet.md)
+- [x] [NUNet](docs/network/NUNet.md)
+- [x] [TransFuse](docs/network/TransFuse.md)
+- [x] [LGANet](docs/network/LGANet.md)
+- [x] [SwinUnet](docs/network/SwinUnet.md)
 
-### Training
+### How to add a new network
 
-#### [UNet](https://arxiv.org/abs/1505.04597) (There is no official implementation, so we just give the original paper link)
-```shell
-python train.py \
---config configs/BUSI.yaml \
---dataset_name BUSI_all \
---dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/BUSI_all \
---model_name UNet \
---classes 2 \
---image_size 224 \
---optimizer_config_path configs/optimizer_configs/adam.yaml \
---lr_scheduler_config_path configs/lr_scheduler_configs/ReduceLROnPlateau.yaml \
---loss_function_name DiceLoss \
---loss_function_config_path configs/loss_configs/DICE.yaml \
---run_dir /home/chouheiwa/machine_learning/models/runs
-```
+There are several steps to add a new network:
 
-#### [PMFSNet](https://github.com/yykzjh/PMFSNet)
+1. Create a new python package in the `lib/models/networks` folder (if your network is just a simple pytorch file, just
+   copy it to the folder).
 
-Training on BUSI dataset with PMFSNet model and DiceLoss loss function, you can run the following command:
-
-```shell
-python train.py \
---config configs/BUSI.yaml \
---dataset_name BUSI_all \
---dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/BUSI_all \
---model_name PMFSNet \
---model_config_path ./configs/model_configs/PMFSNet.yaml \
---loss_function_name DiceLoss \
---loss_function_config_path configs/loss_configs/DICE.yaml \
---run_dir ./runs
-```
+2. *\[Optional\]* Create a new config **yaml** file in the `configs/model_configs` folder.
+3. Edit the `__init__.py` file in the `lib/models/networks` folder to import the new network.
+4. Create a new script file in the `example_script` folder to train the new network.
 
 Note:
-
-1. You need to config `--dataset_path` to the real path in your machine.
-2. `--srun_dir` is the directory to save the training logs and checkpoints, and you need to make sure when in test
-   script, the `run_dir` is the same as the training script.
-3. All the params except `--config` are optional, and you can config them in the config yaml file.
-4. The params with the suffix `config_path` will be load with yaml and the params without the suffix add to the param,
-   so if you don't want to use the yaml config path, you can just add them in your config file.
-
-#### [SwinUnet](https://github.com/HuCaoFighting/Swin-Unet)
-Training on BUSI dataset with SwinUnet model, you can run the following command:
-
-```shell
-python train.py \
---config configs/BUSI.yaml \
---dataset_name "${dataset_name}" \
---dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/"${dataset_name}" \
---model_name SwinUnet \
---model_config_path configs/model_configs/swin_tiny_patch4_window7_224_lite.yaml \
---loss_function_name DiceLoss \
---loss_function_config_path configs/loss_configs/DICE.yaml \
---pretrain_weight_path /home/chouheiwa/machine_learning/pretrained_models/swin_tiny_patch4_window7_224.pth \
---optimizer_config_path configs/optimizer_configs/adam.yaml \
---lr_scheduler_config_path configs/lr_scheduler_configs/ReduceLROnPlateau.yaml \
---classes 2 \
---image_size 224 \
---run_dir ./runs
-```
-
-Note:
-
-1. The `--image_size` is the input image size need to be 224, so you need to resize the image to 224x224, or else you need to change the model structure.
-
-### Testing
-
-#### PMFSNet
-
-For example testing on BUSI dataset with PMFSNet model, you can run the following command:
-
-```shell
-python test.py \
---config configs/BUSI.yaml \
---dataset_name BUSI_all \
---dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/BUSI_all \
---model_name PMFSNet \
---model_config_path ./configs/model_configs/PMFSNet.yaml \
---loss_function_name DiceLoss \
---loss_function_config_path configs/loss_configs/DICE.yaml \
---run_dir ./runs \
---result_dir ./results
-```
+The `--model_config_path` is the path to the config file that you created in step 2. And it will final convert to the `opt.model_config` in the step 3 `__init__.py` file.
