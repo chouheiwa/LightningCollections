@@ -3,7 +3,7 @@
 Our project is a simple image segmentation project that we aim to implement more segmentation network that to help us to
 write out essay easier.
 
-We used pytorch lightning to implement the project and we also provide the pretrained model for the network that we
+We used pytorch lightning to implement the project, and we also provide the pretrained model for the network that we
 implemented.
 
 ## Setup
@@ -66,6 +66,34 @@ Now we support the following datasets:
 
 ## Run
 
+### How to add a new network
+
+#### Simple Steps
+If your network is a simple network like `UNet`, then just follow the following steps:
+
+1. Create a new python package in the `lib/models/networks` folder (if your network is just a simple pytorch file, just
+   copy it to the folder).
+2. Change your network base class to `LightningModule`.
+3. *\[Optional\]* Create a new config **yaml** file in the `configs/model_configs` folder.
+4. Edit the `__init__.py` file in the `lib/models/networks` folder to import the new network.
+5. Create a new script file in the `example_script` folder to train the new network.
+
+Note:
+1. The `--model_config_path` is the path to the config file that you created in step 2. And it will finally convert to
+the `opt.model_config` in the step 3 `__init__.py` file.
+2. If your network need to use the pretrained model, you can add the `--pretrained_model_path` to the script file.
+
+#### Complex Steps
+If your network is a complex network like `LGANet`, you need to follow the following steps:
+
+1. Create a new python package in the `lib/models/networks` folder (if your network is just a simple pytorch file, just
+   copy it to the folder).
+2. Change your network base class to `LightningModule`, and then rewrite the method `training_step`, `validation_step`,
+   `test_step`, note that `training_step`, `validation_step` need to return the final `loss`, `test_step` need to return the predict result.
+3. *\[Optional\]* Create a new config **yaml** file in the `configs/model_configs` folder.
+4. Edit the `__init__.py` file in the `lib/models/networks` folder to import the new network.
+5. Create a new script file in the `example_script` folder to train the new network.
+
 ### Network
 
 Now we implement the following networks(you can click the name to see the detail information):
@@ -76,17 +104,3 @@ Now we implement the following networks(you can click the name to see the detail
 - [x] [TransFuse](docs/network/TransFuse.md)
 - [x] [LGANet](docs/network/LGANet.md)
 - [x] [SwinUnet](docs/network/SwinUnet.md)
-
-### How to add a new network
-
-There are several steps to add a new network:
-
-1. Create a new python package in the `lib/models/networks` folder (if your network is just a simple pytorch file, just
-   copy it to the folder).
-
-2. *\[Optional\]* Create a new config **yaml** file in the `configs/model_configs` folder.
-3. Edit the `__init__.py` file in the `lib/models/networks` folder to import the new network.
-4. Create a new script file in the `example_script` folder to train the new network.
-
-Note:
-The `--model_config_path` is the path to the config file that you created in step 2. And it will final convert to the `opt.model_config` in the step 3 `__init__.py` file.
