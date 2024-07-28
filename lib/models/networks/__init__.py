@@ -35,6 +35,14 @@ def get_network_model(opt, isTrain=True):
             if opt.model_name == "UNet":
                 from .UNet import UNet
                 return UNet(n_channels=3, n_classes=opt.classes)
+            if opt.model_name == "XboundFormer":
+                from .XboundFormer import XboundFormer
+                return XboundFormer(
+                    n_classes=opt.classes,
+                    image_size=opt.resize_shape[0],
+                    pretrained_model_path=opt.pretrain_weight_path,
+                    **opt.model_config.get_dict()
+                )
             raise RuntimeError(f"No {opt['model_name']} model available when initialize model")
 
     raise RuntimeError(f"No {opt['dataset_name']} dataset available when initialize model")

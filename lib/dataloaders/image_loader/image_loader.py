@@ -50,7 +50,6 @@ class ImageLoader(Dataset):
 
         GT_path = join(self.ground_truth_path, filename)
 
-
         label = cv2.imread(GT_path, -1)
 
         try:
