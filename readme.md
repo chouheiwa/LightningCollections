@@ -6,6 +6,8 @@ write out essay easier.
 We used pytorch lightning to implement the project, and we also provide the pretrained model for the network that we
 implemented.
 
+
+
 ## Setup
 
 ### Basic Requirements
@@ -37,6 +39,9 @@ sh setup/base_script.sh
 
 You can also open the `setup/setup.sh` or `setup/conda_setup.sh` and `setup/base_script.sh` and then copy the command to
 the **cmd** to install the python requirements.
+
+### Our Device
+1 x NVIDIA GeForce RTX 2080 Ti 22GB
 
 ### Dataset Preparation
 

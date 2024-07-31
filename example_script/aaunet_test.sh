@@ -5,8 +5,7 @@ python test.py \
 --config configs/BUSI.yaml \
 --dataset_name "${dataset_name}" \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/"${dataset_name}" \
---model_name XboundFormer \
---model_config_path configs/model_configs/XboundFormer.yaml \
+--model_name AAUNet \
 --classes 2 \
 --image_size 224 \
 --run_dir /home/chouheiwa/machine_learning/models/runs \

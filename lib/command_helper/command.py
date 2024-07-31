@@ -101,6 +101,7 @@ class Command:
             parser.add_argument("--forbid_metrics", type=bool, default=False,
                                 help="need metrics, if need metrics then you must provide the mask image path")
         else:
+            parser.add_argument("--drop_last", type=bool, default=False, help="drop last batch")
             parser.add_argument("--optimizer_config_path", type=str, default=None, help="optimizer config file path")
             parser.add_argument("--lr_scheduler_config_path", type=str, default=None,
                                 help="lr scheduler config file path")

@@ -16,7 +16,7 @@ def get_data_loader(opt):
         train_set = SimpleDataset(opt, mode="train")
         valid_set = SimpleDataset(opt, mode="valid")
 
-        train_loader = DataLoader(train_set, batch_size=opt["batch_size"], shuffle=True, num_workers=opt["num_workers"], pin_memory=True)
+        train_loader = DataLoader(train_set, batch_size=opt["batch_size"], shuffle=True, num_workers=opt["num_workers"], pin_memory=True, drop_last=opt.drop_last)
         valid_loader = DataLoader(valid_set, batch_size=1, shuffle=False, num_workers=opt["num_workers"], pin_memory=True)
 
     else:

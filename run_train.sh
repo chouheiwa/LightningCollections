@@ -1,7 +1,8 @@
 #!/bin/bash
 
-all_models_script=("nunet_train.sh" "swinunet_train.sh" "fatnet_train.sh" "lganet_train.sh" "TransFuse_train.sh")
-all_data_array=("all" "bad" "benign" "malignant")
+all_models_script=("aaunet_train.sh")
+#all_data_array=("all" "bad" "benign" "malignant")
+all_data_array=("bad")
 #all_data_array=("malignant")
 
 for model_script in "${all_models_script[@]}"; do

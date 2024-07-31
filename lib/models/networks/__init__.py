@@ -3,6 +3,12 @@ def get_network_model(opt, isTrain=True):
     simple_image_segmentation_datasets = ["ISIC", "BUSI"]
     for dataset in simple_image_segmentation_datasets:
         if dataset in opt["dataset_name"]:
+            if opt.model_name == "UNet":
+                from .UNet import UNet
+                return UNet(n_channels=3, n_classes=opt.classes)
+            if opt.model_name == "AttUNet":
+                from .AttUNet import AttUNet
+                return AttUNet(img_ch=3, output_ch=opt.classes)
             if opt.model_name == "PMFSNet":
                 from .PMFSNet import PMFSNet
                 return PMFSNet(opt)
@@ -32,9 +38,9 @@ def get_network_model(opt, isTrain=True):
             if opt.model_name == "NUNet":
                 from .NUNet import NUNet
                 return NUNet(num_classes=opt.classes)
-            if opt.model_name == "UNet":
-                from .UNet import UNet
-                return UNet(n_channels=3, n_classes=opt.classes)
+            if opt.model_name == "AAUNet":
+                from .AAUNet import AAUNet
+                return AAUNet(n_channels=3, n_classes=opt.classes)
             if opt.model_name == "XboundFormer":
                 from .XboundFormer import XboundFormer
                 return XboundFormer(
