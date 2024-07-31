@@ -47,7 +47,7 @@ the **cmd** to install the python requirements.
 
 Now we support the following datasets:
 
-- [x] [BUSI](docs/dataset/BUSI.md)
+- [x] [BUSI](docs/dataset/BUSI/BUSI.md)
 - [ ] ISIC(https://challenge.isic-archive.com/data/)
 
 #### Common Simple Image Segmentation Dataset
@@ -104,8 +104,8 @@ Now we implement the following networks(you can click the name to see the detail
 - [x] [LGANet](docs/network/LGANet.md)
 - [x] [SwinUnet](docs/network/SwinUnet.md)
 - [x] [XboundFormer](docs/network/XboundFormer.md)
+- [x] [AAU-Net](docs/network/AAUNet.md)
 
 And we will support these networks in the future:
 - [ ] [AttU-Net](https://github.com/ozan-oktay/Attention-Gated-Networks)
 - [ ] [TransU-Net](https://github.com/Beckschen/TransUNet)
-- [ ] [AAU-Net]()
