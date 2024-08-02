@@ -72,7 +72,7 @@ If your network is a simple network like `UNet`, then just follow the following 
 
 1. Create a new python package in the `lib/models/networks` folder (if your network is just a simple pytorch file, just
    copy it to the folder).
-2. Change your network base class to `LightningModule`.
+2. ~~Change your network base class to `LightningModule`.~~
 3. *(Optional)* Create a new config **yaml** file in the `configs/model_configs` folder.
 4. Edit the `__init__.py` file in the `lib/models/networks` folder to import the new network.
 5. Create a new script file in the `example_script` folder to train the new network.
@@ -105,6 +105,7 @@ Now we implement the following networks(you can click the name to see the detail
 - [x] [SwinUnet](docs/network/SwinUnet.md)
 - [x] [XboundFormer](docs/network/XboundFormer.md)
 - [x] [AAU-Net](docs/network/AAUNet.md)
+- [ ] [MALUNet]()
 
 And we will support these networks in the future:
 - [ ] [AttU-Net](https://github.com/ozan-oktay/Attention-Gated-Networks)

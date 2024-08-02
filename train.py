@@ -38,7 +38,7 @@ if __name__ == '__main__':
         )
     ]
     if command.params.need_early_stop:
-        callbacks.append(EarlyStopping(monitor="val/BinaryJaccardIndex", mode="max", patience=20))
+        callbacks.append(EarlyStopping(monitor="val/BinaryJaccardIndex", mode="max", patience=30))
 
     trainer = Trainer(
         default_root_dir=command.params.run_dir,

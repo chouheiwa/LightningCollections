@@ -1,5 +1,6 @@
 #!/bin/bash
 dataset_name=${1:-"BUSI_all"}
+extra_params=${2:-""}
 
 python train.py \
 --config configs/BUSI.yaml \
@@ -14,4 +15,5 @@ python train.py \
 --lr_scheduler_config_path configs/lr_scheduler_configs/ReduceLROnPlateau.yaml \
 --classes 2 \
 --image_size 224 \
---run_dir /home/chouheiwa/machine_learning/models/runs
+--run_dir /home/chouheiwa/machine_learning/models/runs \
+${extra_params}

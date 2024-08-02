@@ -6,7 +6,7 @@ python train.py \
 --config configs/BUSI.yaml \
 --dataset_name "${dataset_name}" \
 --dataset_path /home/chouheiwa/machine_learning/dataset/BUSI数据集/"${dataset_name}" \
---model_name UNet \
+--model_name MALUNet \
 --classes 2 \
 --image_size 224 \
 --optimizer_config_path configs/optimizer_configs/adam.yaml \

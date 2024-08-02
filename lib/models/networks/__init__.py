@@ -49,6 +49,9 @@ def get_network_model(opt, isTrain=True):
                     pretrained_model_path=opt.pretrain_weight_path,
                     **opt.model_config.get_dict()
                 )
+            if opt.model_name == "MALUNet":
+                from .MALUNet import MALUNet
+                return MALUNet(num_classes=opt.classes, input_channels=3)
             raise RuntimeError(f"No {opt['model_name']} model available when initialize model")
 
     raise RuntimeError(f"No {opt['dataset_name']} dataset available when initialize model")

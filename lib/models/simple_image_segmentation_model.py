@@ -47,7 +47,12 @@ class SimpleImageSegmentationModel(L.LightningModule):
         self.train_losses.clear()
 
     def training_step(self, batch, batch_idx):
-        has_step = is_overridden("training_step", self.net)
+        has_step = False
+
+        try:
+            has_step = is_overridden("training_step", self.net)
+        except:
+            pass
 
         if has_step:
             loss = self.net.training_step(batch, batch_idx,
@@ -68,7 +73,11 @@ class SimpleImageSegmentationModel(L.LightningModule):
         self.valid_losses.clear()
 
     def validation_step(self, batch, batch_idx):
-        has_step = is_overridden("validation_step", self.net)
+        has_step = False
+        try:
+            has_step = is_overridden("validation_step", self.net)
+        except:
+            pass
 
         if has_step:
             loss = self.net.validation_step(batch, batch_idx, valid_metrics=self.valid_metrics,
@@ -84,7 +93,11 @@ class SimpleImageSegmentationModel(L.LightningModule):
         self.log('val_loss', torch.tensor(self.valid_losses).mean(), prog_bar=True)
 
     def test_step(self, batch, batch_idx):
-        has_step = is_overridden("test_step", self.net)
+        has_step = False
+        try:
+            has_step = is_overridden("test_step", self.net)
+        except:
+            pass
         input_tensor, target, image_names = batch
         if has_step:
             output = self.net.test_step(batch, batch_idx)
