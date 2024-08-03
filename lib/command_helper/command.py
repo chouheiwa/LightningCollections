@@ -110,6 +110,7 @@ class Command:
             parser.add_argument("--batch_size", type=int, default=None, help="Batch size")
             parser.add_argument("--end_epoch", type=int, default=None, help="End epoch")
             parser.add_argument("--need_early_stop", type=bool, default=False, help="need early stop")
+            parser.add_argument("--custom_seed", type=int, default=None, help="custom seed")
 
         args = parser.parse_args()
         return args

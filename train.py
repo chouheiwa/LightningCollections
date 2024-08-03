@@ -1,4 +1,4 @@
-from lightning import Trainer
+from lightning import Trainer, seed_everything
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 
 from lib import command_helper, dataloaders, models, losses, best_model_name
@@ -6,6 +6,9 @@ from lib.progress_bar import CustomProgressBar
 
 if __name__ == '__main__':
     command = command_helper.Command()
+
+    if command.params.custom_seed is not None:
+        seed_everything(command.params.custom_seed)
 
     train_loader, valid_loader = dataloaders.get_data_loader(command.params)
 
