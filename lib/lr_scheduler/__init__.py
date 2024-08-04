@@ -9,24 +9,22 @@ def get_lr_scheduler(optimizer, config):
     scheduler = scheduler.get_dict() if scheduler is not None else {}
 
     if name == "ExponentialLR":
-        lrs = lr_scheduler.ExponentialLR(optimizer, gamma=config.gamma)
+        lrs = lr_scheduler.ExponentialLR(optimizer, **scheduler)
 
     elif name == "StepLR":
-        lrs = lr_scheduler.StepLR(optimizer, step_size=config.step_size, gamma=config.gamma)
+        lrs = lr_scheduler.StepLR(optimizer, **scheduler)
 
     elif name == "MultiStepLR":
-        lrs = lr_scheduler.MultiStepLR(optimizer, milestones=config.milestones, gamma=config.gamma)
+        lrs = lr_scheduler.MultiStepLR(optimizer, **scheduler)
 
     elif name == "CosineAnnealingLR":
-        lrs = lr_scheduler.CosineAnnealingLR(optimizer, T_max=config.T_max)
+        lrs = lr_scheduler.CosineAnnealingLR(optimizer, **scheduler)
 
     elif name == "CosineAnnealingWarmRestarts":
         lrs = lr_scheduler.CosineAnnealingWarmRestarts(optimizer, **scheduler)
 
     elif name == "OneCycleLR":
-        lrs = lr_scheduler.OneCycleLR(optimizer, max_lr=config.learning_rate,
-                                                     steps_per_epoch=config.steps_per_epoch, epochs=config.end_epoch,
-                                                     cycle_momentum=False)
+        lrs = lr_scheduler.OneCycleLR(optimizer, **scheduler)
 
     elif name == "ReduceLROnPlateau":
         lrs = lr_scheduler.ReduceLROnPlateau(optimizer, **scheduler)

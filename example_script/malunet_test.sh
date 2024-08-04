@@ -7,7 +7,7 @@ python test.py \
 --config configs/Common.yaml \
 --dataset_name "${dataset_name}" \
 --dataset_path "${dataset_path}" \
---model_name FATNet \
+--model_name MALUNet \
 --classes 2 \
 --image_size 224 \
 ${extra_params}

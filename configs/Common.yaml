@@ -1,0 +1,22 @@
+resize_shape:
+  - 224
+  - 224
+augmentation_p: 0.1
+color_jitter: 0.37
+random_rotation_angle: 15
+gt_format: '{}.png'
+batch_size: 32
+num_workers: 2
+model_name: PMFSNet
+in_channels: 3
+classes: 2
+index_to_class_dict:
+  0: background
+  1: foreground
+pretrain: null
+
+run_dir: ./runs
+end_epoch: 250
+
+use_image_transform: False
+result_path: ./results
