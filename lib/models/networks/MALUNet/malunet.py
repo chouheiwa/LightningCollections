@@ -114,47 +114,30 @@ class EAblock(nn.Module):
 
 
 class ChannelAttBridge(nn.Module):
-    def __init__(self, c_list, split_att='fc'):
+    def __init__(self, c_list: list[int], split_att='fc'):
         super().__init__()
-        c_list_sum = sum(c_list) - c_list[-1]
+        c_list_sum = sum(c_list)
         self.split_att = split_att
         self.avgpool = nn.AdaptiveAvgPool2d(1)
         self.get_all_att = nn.Conv1d(1, 1, kernel_size=3, padding=1, bias=False)
-        self.att1 = nn.Linear(c_list_sum, c_list[0]) if split_att == 'fc' else nn.Conv1d(c_list_sum, c_list[0], 1)
-        self.att2 = nn.Linear(c_list_sum, c_list[1]) if split_att == 'fc' else nn.Conv1d(c_list_sum, c_list[1], 1)
-        self.att3 = nn.Linear(c_list_sum, c_list[2]) if split_att == 'fc' else nn.Conv1d(c_list_sum, c_list[2], 1)
-        self.att4 = nn.Linear(c_list_sum, c_list[3]) if split_att == 'fc' else nn.Conv1d(c_list_sum, c_list[3], 1)
-        self.att5 = nn.Linear(c_list_sum, c_list[4]) if split_att == 'fc' else nn.Conv1d(c_list_sum, c_list[4], 1)
+        self.att_list = nn.ModuleList([
+            nn.Linear(c_list_sum, c_list[i]) if split_att == 'fc' else nn.Conv1d(c_list_sum, c_list[i], 1)
+            for i in range(len(c_list))
+        ])
         self.sigmoid = nn.Sigmoid()
 
-    def forward(self, t1, t2, t3, t4, t5):
-        att = torch.cat((self.avgpool(t1),
-                         self.avgpool(t2),
-                         self.avgpool(t3),
-                         self.avgpool(t4),
-                         self.avgpool(t5)), dim=1)
+    def forward(self, *list):
+        att = torch.cat([self.avgpool(t) for t in list], dim=1)
         att = self.get_all_att(att.squeeze(-1).transpose(-1, -2))
         if self.split_att != 'fc':
             att = att.transpose(-1, -2)
-        att1 = self.sigmoid(self.att1(att))
-        att2 = self.sigmoid(self.att2(att))
-        att3 = self.sigmoid(self.att3(att))
-        att4 = self.sigmoid(self.att4(att))
-        att5 = self.sigmoid(self.att5(att))
+        att_list = [self.sigmoid(att_layer(att)) for att_layer in self.att_list]
         if self.split_att == 'fc':
-            att1 = att1.transpose(-1, -2).unsqueeze(-1).expand_as(t1)
-            att2 = att2.transpose(-1, -2).unsqueeze(-1).expand_as(t2)
-            att3 = att3.transpose(-1, -2).unsqueeze(-1).expand_as(t3)
-            att4 = att4.transpose(-1, -2).unsqueeze(-1).expand_as(t4)
-            att5 = att5.transpose(-1, -2).unsqueeze(-1).expand_as(t5)
+            att_list = [att.transpose(-1, -2).unsqueeze(-1).expand_as(t) for att, t in zip(att_list, list)]
         else:
-            att1 = att1.unsqueeze(-1).expand_as(t1)
-            att2 = att2.unsqueeze(-1).expand_as(t2)
-            att3 = att3.unsqueeze(-1).expand_as(t3)
-            att4 = att4.unsqueeze(-1).expand_as(t4)
-            att5 = att5.unsqueeze(-1).expand_as(t5)
+            att_list = [att.unsqueeze(-1).expand_as(t) for att, t in zip(att_list, list)]
 
-        return att1, att2, att3, att4, att5
+        return att_list
 
 
 class SpatialAttBridge(nn.Module):
@@ -163,8 +146,7 @@ class SpatialAttBridge(nn.Module):
         self.shared_conv2d = nn.Sequential(nn.Conv2d(2, 1, 7, stride=1, padding=9, dilation=3),
                                            nn.Sigmoid())
 
-    def forward(self, t1, t2, t3, t4, t5):
-        t_list = [t1, t2, t3, t4, t5]
+    def forward(self, *t_list):
         att_list = []
         for t in t_list:
             avg_out = torch.mean(t, dim=1, keepdim=True)
@@ -172,7 +154,7 @@ class SpatialAttBridge(nn.Module):
             att = torch.cat([avg_out, max_out], dim=1)
             att = self.shared_conv2d(att)
             att_list.append(att)
-        return att_list[0], att_list[1], att_list[2], att_list[3], att_list[4]
+        return att_list
 
 
 class ScAttBridge(nn.Module):
@@ -182,19 +164,28 @@ class ScAttBridge(nn.Module):
         self.catt = ChannelAttBridge(c_list, split_att=split_att)
         self.satt = SpatialAttBridge()
 
-    def forward(self, t1, t2, t3, t4, t5):
-        r1, r2, r3, r4, r5 = t1, t2, t3, t4, t5
+    def forward(self, *list):
+        r = list
+        satt = self.satt(*list)
+        t = [s * item for s, item in zip(satt, list)]
+        r_1 = t
+        t = [t1 + r1 for t1, r1 in zip(t, r)]
 
-        satt1, satt2, satt3, satt4, satt5 = self.satt(t1, t2, t3, t4, t5)
-        t1, t2, t3, t4, t5 = satt1 * t1, satt2 * t2, satt3 * t3, satt4 * t4, satt5 * t5
+        catt = self.catt(*t)
+        t = [c * item for c, item in zip(catt, t)]
+        return [t1 + r1 for t1, r1 in zip(t, r_1)]
 
-        r1_, r2_, r3_, r4_, r5_ = t1, t2, t3, t4, t5
-        t1, t2, t3, t4, t5 = t1 + r1, t2 + r2, t3 + r3, t4 + r4, t5 + r5
-
-        catt1, catt2, catt3, catt4, catt5 = self.catt(t1, t2, t3, t4, t5)
-        t1, t2, t3, t4, t5 = catt1 * t1, catt2 * t2, catt3 * t3, catt4 * t4, catt5 * t5
-
-        return t1 + r1_, t2 + r2_, t3 + r3_, t4 + r4_, t5 + r5_
+        # r1, r2, r3, r4, r5 = t1, t2, t3, t4, t5
+        # satt1, satt2, satt3, satt4, satt5 = self.satt(t1, t2, t3, t4, t5)
+        # t1, t2, t3, t4, t5 = satt1 * t1, satt2 * t2, satt3 * t3, satt4 * t4, satt5 * t5
+        #
+        # r1_, r2_, r3_, r4_, r5_ = t1, t2, t3, t4, t5
+        # t1, t2, t3, t4, t5 = t1 + r1, t2 + r2, t3 + r3, t4 + r4, t5 + r5
+        #
+        # catt1, catt2, catt3, catt4, catt5 = self.catt(t1, t2, t3, t4, t5)
+        # t1, t2, t3, t4, t5 = catt1 * t1, catt2 * t2, catt3 * t3, catt4 * t4, catt5 * t5
+        #
+        # return t1 + r1_, t2 + r2_, t3 + r3_, t4 + r4_, t5 + r5_
 
 
 class MALUNet(nn.Module):
@@ -230,7 +221,7 @@ class MALUNet(nn.Module):
         )
 
         if bridge:
-            self.scab = ScAttBridge(c_list, split_att)
+            self.scab = ScAttBridge(c_list[0:5], split_att)
             print('SC_Att_Bridge was used')
 
         self.decoder1 = nn.Sequential(

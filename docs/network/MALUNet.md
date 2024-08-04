@@ -6,6 +6,8 @@
 
 MALUNet is mainly workable for ISIC dataset. This network performance very bad on BUSI dataset.
 
+We rewrite the `SpatialAttBridge` to make it accept dynamic input tensors, the origin code only accept 5 input tensors.
+
 ## Network Metrics
 
 ### BUSI
