@@ -44,6 +44,8 @@ if __name__ == '__main__':
         callbacks.append(EarlyStopping(monitor="val/BinaryJaccardIndex", mode="max", patience=30))
 
     trainer = Trainer(
+        accelerator=command.params.accelerator,
+        devices=command.params.devices,
         default_root_dir=command.params.run_dir,
         benchmark=True,
         max_epochs=command.params.end_epoch,

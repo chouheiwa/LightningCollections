@@ -77,6 +77,8 @@ class Command:
     def parse_args(self, isTest=False):
         parser = argparse.ArgumentParser()
         parser.add_argument("--config", type=str, default='./configs/BUSI.yaml', help="config file path")
+        parser.add_argument("--accelerator", type=str, default='auto', help="accelerator")
+        parser.add_argument("--devices", type=str, default='auto', help="devices")
 
         parser.add_argument("--dataset_name", type=str, default=None, help="dataset name")
         parser.add_argument("--dataset_path", type=str, default=None, help="dataset path")
