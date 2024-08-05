@@ -1,6 +1,9 @@
+import os
+
 import torch
 from torchvision import models as resnet_model
 from torch import nn
+from .deit import deit_tiny_distilled_patch16_224
 import lightning as L
 
 
@@ -81,11 +84,13 @@ class SEBlock(nn.Module):
 
 
 class FATNet(L.LightningModule):
-    def __init__(self, n_channels=3, n_classes=1):
+    def __init__(self, n_channels=3, n_classes=1, pretrained_model_path=None):
         super(FATNet, self).__init__()
 
-        transformer = torch.hub.load('facebookresearch/deit:main', 'deit_tiny_distilled_patch16_224', pretrained=True)
-        resnet = resnet_model.resnet34(pretrained=True)
+        transformer = deit_tiny_distilled_patch16_224(pretrain_model_path=pretrained_model_path)
+        resnet = resnet_model.resnet34(pretrained=False)
+        if pretrained_model_path:
+            resnet.load_state_dict(torch.load(os.path.join(pretrained_model_path, 'resnet34-b627a593.pth')))
 
         self.firstconv = resnet.conv1
         self.firstbn = resnet.bn1

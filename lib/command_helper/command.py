@@ -96,6 +96,7 @@ class Command:
         parser.add_argument("--image_size", type=int, default=None, help="Image size")
         parser.add_argument("--gt_format", type=str, default=None, help="Ground truth image file format")
         if isTest:
+            parser.add_argument("--best_model_path", type=str, default=None, help="best model path")
             parser.add_argument("--result_dir", type=str, default=None,
                                 help="Result Root Directory")
             parser.add_argument("--forbid_auto_append", type=bool, default=False,

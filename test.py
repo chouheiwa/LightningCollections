@@ -25,6 +25,9 @@ if __name__ == '__main__':
 
     best_number, best_ckpt_path, last_ckpt_path = get_best_model_checkpoint(command.params)
 
+    if command.params.best_model_path is not None:
+        best_ckpt_path = command.params.best_model_path
+
     command.params.run_dir = os.path.join(command.params.run_dir, 'lightning_logs', f'version_{best_number}')
 
     test_loader = dataloaders.get_test_data_loader(command.params)

@@ -105,8 +105,13 @@ Now we implement the following networks(you can click the name to see the detail
 - [x] [SwinUnet](docs/network/SwinUnet.md)
 - [x] [XboundFormer](docs/network/XboundFormer.md)
 - [x] [AAU-Net](docs/network/AAUNet.md)
-- [ ] [MALUNet]()
+- [x] [MALUNet](docs/network/MALUNet.md)
+- [x] [FATNet](docs/network/FATNet.md)
 
 And we will support these networks in the future:
 - [ ] [AttU-Net](https://github.com/ozan-oktay/Attention-Gated-Networks)
 - [ ] [TransU-Net](https://github.com/Beckschen/TransUNet)
+
+### Others
+1. We provide some best model link to help you to download the best model that we trained. You can click the link to
+   download the model. And if you want to use that model, you can use the `--best_model_path` to load the model in the `test.py`. 
