@@ -25,7 +25,7 @@ def get_network_model(opt, isTrain=True):
                 )
             if opt.model_name == "FATNet":
                 from .FATNet import FATNet
-                return FATNet(n_classes=opt.classes)
+                return FATNet(n_classes=opt.classes, pretrained_model_path=opt.pretrain_weight_path)
             if opt.model_name == "SwinUnet":
                 from .SwinUnet import SwinUnet
                 return SwinUnet(
