@@ -34,7 +34,7 @@ if __name__ == '__main__':
             monitor='val/BinaryJaccardIndex',
             mode='max',
             save_top_k=1,
-            save_last=True,
+            save_last=False,
             save_weights_only=True,
             save_on_train_epoch_end=True,
             enable_version_counter=False,
