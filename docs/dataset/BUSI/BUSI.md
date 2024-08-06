@@ -1,7 +1,7 @@
 # BUSI Dataset (Breast Ultrasound Images Dataset)
 
 The original dataset is in
-the [BUSI dataset](https://www.kaggle.com/datasets/sabahesaraki/breast-ultrasound-images-dataset) and you can download
+the [BUSI dataset](https://www.kaggle.com/datasets/sabahesaraki/breast-ultrasound-images-dataset), and you can download
 it from the link. After downloading the dataset, you need to unzip the dataset. The dataset structure is as follows:
 
 ## Dataset Structure
