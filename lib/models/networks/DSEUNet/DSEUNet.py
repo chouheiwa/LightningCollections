@@ -2,6 +2,8 @@ import torch
 from torch import nn
 import lightning as L
 
+from lib.utils import expand_as_one_hot
+
 
 class SingleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -78,26 +80,10 @@ class UpConvBlock(nn.Module):
         return self.out_conv(se_layer)
 
 
-class PredictOut(nn.Module):
-    def __init__(self, in_channels, num_classes, image_size):
-        super(PredictOut, self).__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=num_classes, kernel_size=(1, 1), stride=(1, 1),
-                      padding=(0, 0)),
-            nn.Sigmoid(),
-        )
-        self.up = nn.Upsample(size=image_size)
-
-    def forward(self, x):
-        conv = self.conv(x)
-        return self.up(conv)
-
-
 class DSEUNet(L.LightningModule):
     def __init__(self, num_classes, image_size):
         super(DSEUNet, self).__init__()
-        self.use_custom_loss_function = True
-        self.loss_func = nn.BCELoss()
+        self.n_classes = num_classes
 
         if isinstance(image_size, int):
             image_size = (image_size, image_size)
@@ -118,9 +104,6 @@ class DSEUNet(L.LightningModule):
             self.up_blocks.append(
                 UpConvBlock(dims[i], dims[i - 1], dims[i - 1])
             )
-            self.predict_outs.append(
-                PredictOut(dims[i - 1], num_classes, image_size)
-            )
 
         self.out_conv = nn.Conv2d(in_channels=dims[0], out_channels=num_classes, kernel_size=(1, 1), stride=(1, 1),
                                   padding=(0, 0))
@@ -132,29 +115,7 @@ class DSEUNet(L.LightningModule):
             conv = down(conv)
             down_list.append(conv)
 
-        up_predict_list = []
         up = down_list[-1]
         for i in range(len(self.up_blocks)):
             up = self.up_blocks[i](up, down_list[-2 - i])
-
-            if self.training:
-                predict_temp = self.predict_outs[i](up)
-                up_predict_list.append(predict_temp)
-        up_predict_list.reverse()
-        if self.training:
-            return self.out_conv(up), *up_predict_list
-        else:
-            return self.out_conv(up)
-
-    def training_step(self, batch, batch_idx, train_metrics, normalization):
-        img, msk, _ = self._preload_data(batch)
-        predict = self(img)
-        msk_pred = predict[0]
-
-        predict_normal = normalization(msk_pred)
-        predict_normal = torch.argmax(predict_normal, dim=1).float()
-        train_metrics.update(predict_normal, msk.int())
-        loss = 0
-        for temp in predict:
-            loss += self.loss_func(temp, msk)
-        return loss
+        return self.out_conv(up)
