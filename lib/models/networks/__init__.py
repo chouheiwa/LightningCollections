@@ -41,6 +41,9 @@ def get_network_model(opt, isTrain=True):
             if opt.model_name == "AAUNet":
                 from .AAUNet import AAUNet
                 return AAUNet(n_channels=3, n_classes=opt.classes)
+            if opt.model_name == "DSEUNet":
+                from .DSEUNet import DSEUNet
+                return DSEUNet(num_classes=opt.classes, image_size=opt.resize_shape)
             if opt.model_name == "XboundFormer":
                 from .XboundFormer import XboundFormer
                 return XboundFormer(

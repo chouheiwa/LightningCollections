@@ -18,8 +18,8 @@ and [test](../../example_script/lganet_test.sh) in the `example_script` folder.
 
 ### BUSI
 
-|    Dataset     | AUROC | Accuracy | AveragePrecision | F1Score | JaccardIndex | Precision | Recall | Specificity | Dice | Best Model Link |
-|:--------------:|:-----:|:--------:|:----------------:|:-------:|:------------:|:---------:|:------:|:-----------:|:----:|:---------------:|
+|    Dataset     | AUROC | Accuracy | AveragePrecision | F1Score | JaccardIndex | Precision | Recall | Specificity | Dice |
+|:--------------:|:-----:|:--------:|:----------------:|:-------:|:------------:|:---------:|:------:|:-----------:|:----:|
 |    BUSI_all    |
 |    BUSI_bad    |
 |  BUSI_benign   |

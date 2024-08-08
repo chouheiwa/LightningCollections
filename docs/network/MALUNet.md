@@ -12,8 +12,8 @@ We rewrite the `SpatialAttBridge` to make it accept dynamic input tensors, the o
 
 ### BUSI
 
-|    Dataset     | AUROC | Accuracy | AveragePrecision | F1Score | JaccardIndex | Precision | Recall | Specificity | Dice | Best Model Link |
-|:--------------:|:-----:|:--------:|:----------------:|:-------:|:------------:|:---------:|:------:|:-----------:|:----:|:---------------:|
+|    Dataset     | AUROC | Accuracy | AveragePrecision | F1Score | JaccardIndex | Precision | Recall | Specificity | Dice |
+|:--------------:|:-----:|:--------:|:----------------:|:-------:|:------------:|:---------:|:------:|:-----------:|:----:|
 |    BUSI_all    |
 |    BUSI_bad    |
 |  BUSI_benign   |
