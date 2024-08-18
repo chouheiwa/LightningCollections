@@ -1,17 +1,14 @@
 import os
-from typing import Union, Sequence, Any
 
 import lightning as L
 import torch
 import torch.nn as nn
 import torchvision
-from lightning import Callback
-from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import CSVLogger
 from lightning.pytorch.utilities.model_helpers import is_overridden
 
+from lib.lr_scheduler import get_lr_scheduler
 from lib.metrics import get_binary_metrics, cal_params_flops
-from lib import best_model_name, lr_scheduler
 from lib.optimizer import get_optimizer
 
 
@@ -137,7 +134,7 @@ class SimpleImageSegmentationModel(L.LightningModule):
 
     def configure_optimizers(self):
         optimizer = get_optimizer(self.opt, self.net)
-        lr_schedulers = lr_scheduler.get_lr_scheduler(optimizer, self.opt)
+        lr_schedulers = get_lr_scheduler(optimizer, self.opt)
 
         if lr_schedulers is None:
             return {
