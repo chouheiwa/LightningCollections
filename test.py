@@ -7,6 +7,7 @@ from lib import command_helper, dataloaders, models
 from lib import best_model_name
 from lib.progress_bar import CustomProgressBar
 
+
 def get_best_model_checkpoint(opt):
     best_path = None
     best_number = -1000
@@ -18,10 +19,12 @@ def get_best_model_checkpoint(opt):
             if number > best_number:
                 best_number = number
                 best_path = data
-    return best_number, os.path.join(base_path, best_path, 'checkpoints', f'{best_model_name}.ckpt'), os.path.join(base_path, best_path, 'checkpoints', f'last.ckpt')
+    return best_number, os.path.join(base_path, best_path, 'checkpoints', f'{best_model_name}.ckpt'), os.path.join(
+        base_path, best_path, 'checkpoints', f'last.ckpt')
 
-if __name__ == '__main__':
-    command = command_helper.Command(isTest=True)
+
+def test(args=None):
+    command = command_helper.Command(isTest=True, args=args)
 
     best_number, best_ckpt_path, last_ckpt_path = get_best_model_checkpoint(command.params)
 
@@ -43,3 +46,7 @@ if __name__ == '__main__':
         callbacks=[CustomProgressBar(command.params.dataset_name, command.params.model_name)]
     )
     trainer.test(model, test_loader, ckpt_path=best_ckpt_path)
+
+
+if __name__ == '__main__':
+    test()

@@ -64,8 +64,11 @@ def read_yaml(file_path):
 
 
 class Command:
-    def __init__(self, isTest=False):
-        self.args = self.parse_args(isTest)
+    def __init__(self, isTest=False, args=None):
+        if args is not None:
+            self.args = args
+        else:
+            self.args = self.parse_args(isTest)
         self.parse_args_config()
         try:
             self.params = read_yaml(self.args.config)

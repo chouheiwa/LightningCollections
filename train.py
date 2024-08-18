@@ -4,8 +4,9 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lib import command_helper, dataloaders, models, losses, best_model_name
 from lib.progress_bar import CustomProgressBar
 
-if __name__ == '__main__':
-    command = command_helper.Command()
+
+def train(args=None):
+    command = command_helper.Command(args=args)
 
     if command.params.custom_seed is not None:
         seed_everything(command.params.custom_seed)
@@ -52,3 +53,7 @@ if __name__ == '__main__':
         callbacks=callbacks
     )
     trainer.fit(model, train_loader, valid_loader)
+
+
+if __name__ == '__main__':
+    train()
