@@ -69,6 +69,9 @@ class Command:
             self.args = args
         else:
             self.args = self.parse_args(isTest)
+
+        print(self.args)
+        exit(0)
         self.parse_args_config()
         try:
             self.params = read_yaml(self.args.config)
